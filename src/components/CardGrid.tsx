@@ -33,7 +33,7 @@ export default function CardGrid({
   const topRow = cards.filter((c) => c.position < cols);
   const bottomRow = cards.filter((c) => c.position >= cols);
 
-  const renderCard = (pc: PlayerCard, index: number) => {
+  const renderCard = (pc: PlayerCard, _index: number) => {
     const isSelectable = selectablePositions.includes(pc.position);
     const isHighlighted = highlightedPositions.includes(pc.position);
     const known = !pc.faceUp ? knownCards?.get(pc.position) : undefined;
