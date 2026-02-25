@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { GameStateFromServer, RoomOptions, GameMode, CardCount } from '../types';
 import './WaitingRoom.css';
 
@@ -127,8 +128,14 @@ export default function WaitingRoom({
       <div className="player-list surface">
         <h3>플레이어 ({playerCount}/10)</h3>
         <div className="players">
-          {gameState.players.map((p) => (
-            <div key={p.id} className={`player-row ${!p.connected ? 'disconnected' : ''}`}>
+          {gameState.players.map((p, i) => (
+            <motion.div
+              key={p.id}
+              className={`player-row ${!p.connected ? 'disconnected' : ''}`}
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.3 }}
+            >
               <span className="player-avatar">{AVATARS[p.avatarIndex] || '🎴'}</span>
               <span className="player-name">
                 {p.nickname}
@@ -137,7 +144,7 @@ export default function WaitingRoom({
               <span className={`player-status ${p.isHost ? 'host' : p.ready ? 'ready' : ''}`}>
                 {p.isHost ? '👑' : p.ready ? '✓ 준비' : '대기중'}
               </span>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

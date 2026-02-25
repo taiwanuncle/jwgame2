@@ -9,6 +9,10 @@
 .gameover-page h1 {
   font-size: var(--font-size-2xl);
   text-align: center;
+  background: linear-gradient(135deg, #ffd700, #ffa000, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Winner highlight */
@@ -21,10 +25,24 @@
   border-radius: var(--radius-xl);
   box-shadow: 0 8px 30px rgba(255, 165, 0, 0.3);
   width: 100%;
+  animation: winner-shimmer 3s ease infinite;
 }
+
+@keyframes winner-shimmer {
+  0%, 100% { box-shadow: 0 8px 30px rgba(255, 165, 0, 0.3); }
+  50% { box-shadow: 0 8px 40px rgba(255, 165, 0, 0.5); }
+}
+
 .winner-avatar {
   font-size: 48px;
+  animation: winner-bounce 1s ease infinite;
 }
+
+@keyframes winner-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 .winner-info {
   display: flex;
   flex-direction: column;
@@ -67,10 +85,12 @@
   padding: var(--gap-md);
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 .rank-row.winner {
   background: rgba(255, 215, 0, 0.1);
   border: 2px solid var(--gold);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
 }
 .rank-num {
   font-size: var(--font-size-lg);

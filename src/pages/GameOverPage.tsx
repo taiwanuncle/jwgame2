@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, ChatMessage } from '../types';
 import GlobalChat from '../components/GlobalChat';
@@ -87,25 +88,47 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
 
   return (
     <div className="page gameover-page">
-      <h1>🏆 게임 종료!</h1>
+      <motion.h1
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        🏆 게임 종료!
+      </motion.h1>
 
       {/* Winner highlight */}
       {winner && (
-        <div className="gameover-winner">
+        <motion.div
+          className="gameover-winner"
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.6, type: 'spring', stiffness: 200, damping: 20 }}
+        >
           <span className="winner-avatar">{AVATARS[winner.avatarIndex] || '🎴'}</span>
           <div className="winner-info">
             <span className="winner-label">우승</span>
             <span className="winner-name">{winner.nickname}</span>
           </div>
           <span className="winner-score">{winner.totalScore}점</span>
-        </div>
+        </motion.div>
       )}
 
-      <div className="final-ranking surface">
+      <motion.div
+        className="final-ranking surface"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
         <h2>최종 순위</h2>
         <div className="ranking-list">
           {sortedPlayers.map((p, i) => (
-            <div key={p.id} className={`rank-row ${i === 0 ? 'winner' : ''} ${p.id === gameState.myId ? 'is-me' : ''}`}>
+            <motion.div
+              key={p.id}
+              className={`rank-row ${i === 0 ? 'winner' : ''} ${p.id === gameState.myId ? 'is-me' : ''}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
+            >
               <span className="rank-num">
                 {i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}위`}
               </span>
@@ -116,12 +139,17 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
                 ))}
               </div>
               <span className="rank-score">{p.totalScore}점</span>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="gameover-actions">
+      <motion.div
+        className="gameover-actions"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.4 }}
+      >
         {isHost && (
           <button className="btn btn-primary btn-large" onClick={onPlayAgain}>
             다시 하기
@@ -130,7 +158,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
         <button className="btn btn-outline btn-large" onClick={onBackToLobby}>
           로비로 돌아가기
         </button>
-      </div>
+      </motion.div>
 
       <GlobalChat messages={chatMessages} onSend={onSendChat} myId={gameState.myId} />
     </div>

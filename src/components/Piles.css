@@ -46,10 +46,11 @@
   width: 96px;
   height: 136px;
   border-radius: 8px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .empty-text {

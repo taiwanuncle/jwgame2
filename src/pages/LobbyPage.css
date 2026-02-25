@@ -13,10 +13,15 @@
   font-size: 64px;
   display: block;
   margin-bottom: var(--gap-md);
+  filter: drop-shadow(0 4px 16px rgba(76, 175, 80, 0.25));
 }
 .lobby-title h1 {
   font-size: var(--font-size-2xl);
   margin-bottom: var(--gap-xs);
+  background: linear-gradient(135deg, #4caf50, #81c784, #a5d6a7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .lobby-buttons {
@@ -28,6 +33,7 @@
 .btn-large {
   padding: 16px 32px;
   font-size: var(--font-size-lg);
+  border-radius: var(--radius-lg);
 }
 
 .back-btn {
@@ -76,7 +82,7 @@
 .avatar-btn.selected {
   border-color: var(--accent);
   background: var(--accent-light);
-  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
 }
 .avatar-btn:hover:not(.selected) {
   background: rgba(255,255,255,0.08);
@@ -86,6 +92,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-lg);
+}
+.bot-options-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+  padding-top: var(--gap-sm);
 }
 .option-group {
   display: flex;
@@ -111,8 +123,9 @@
   transition: all var(--transition-fast);
 }
 .toggle-btn.active {
-  background: var(--accent);
+  background: linear-gradient(135deg, #43a047, #66bb6a);
   color: white;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
 }
 
 .join-options {
@@ -163,19 +176,14 @@
 }
 
 .error-toast {
-  background: var(--danger);
+  background: linear-gradient(135deg, #ef5350, #e53935);
   color: white;
   padding: var(--gap-sm) var(--gap-md);
   border-radius: var(--radius-md);
   text-align: center;
   font-size: var(--font-size-sm);
-  animation: shake 0.3s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
 }
 
 /* Info buttons */
@@ -188,7 +196,7 @@
   font-size: var(--font-size-sm);
 }
 
-/* Bot count toggle - narrower buttons */
+/* Bot count toggle */
 .bot-count-group .toggle-btn {
   min-width: 32px;
   padding: 8px 2px;
