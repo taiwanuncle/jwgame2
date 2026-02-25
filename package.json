@@ -8,7 +8,7 @@
     "dev:client": "vite",
     "dev:server": "node server/index.js",
     "build": "tsc -b && vite build",
-    "build:render": "npm run build && cd server && npm install",
+    "build:render": "npm install --include=dev && npm run build && cd server && npm install",
     "start": "node server/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
