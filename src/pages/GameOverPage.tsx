@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, ChatMessage } from '../types';
 import GlobalChat from '../components/GlobalChat';
+import { playGameOver } from '../utils/sfx';
 import './GameOverPage.css';
 
 const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐯','🐮'];
@@ -21,6 +22,11 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
   const winner = sortedPlayers[0];
   const me = gameState.players.find(p => p.id === gameState.myId);
   const isHost = me?.isHost ?? false;
+
+  // SFX: game over fanfare
+  useEffect(() => {
+    playGameOver();
+  }, []);
 
   // Confetti effect — 3 waves
   useEffect(() => {

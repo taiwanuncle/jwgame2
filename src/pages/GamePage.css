@@ -364,9 +364,13 @@
 
 /* === Scoreboard Button === */
 .scoreboard-btn {
-  font-size: 18px;
-  padding: 2px 6px;
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
   min-width: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
 }
 
 /* === Scoreboard Modal === */

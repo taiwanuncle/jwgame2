@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { useSocket } from './hooks/useSocket';
+import { audioManager } from './utils/audioManager';
+import type { MusicCategory } from './utils/audioManager';
 import LobbyPage from './pages/LobbyPage';
 import WaitingRoom from './pages/WaitingRoom';
 import GamePage from './pages/GamePage';
@@ -30,6 +33,26 @@ function App() {
 
   const isLobby = !gameState || !gameState.roomCode;
   const isWaiting = gameState?.phase === 'waiting';
+
+  // BGM: switch category based on game phase
+  useEffect(() => {
+    let category: MusicCategory;
+    if (isLobby || isWaiting) {
+      category = 'opening';
+    } else if (gameState?.phase === 'game_over' || gameState?.phase === 'round_scoring') {
+      category = 'celebration';
+    } else {
+      category = 'playing';
+    }
+    audioManager.playCategory(category);
+  }, [isLobby, isWaiting, gameState?.phase]);
+
+  // Exit playlist mode when leaving lobby
+  useEffect(() => {
+    if (!isLobby) {
+      audioManager.exitPlaylistMode();
+    }
+  }, [isLobby]);
 
   if (isLobby) {
     return (

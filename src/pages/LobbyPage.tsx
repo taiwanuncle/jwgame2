@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { AvailableRoom, RoomOptions, GameMode, CardCount, BotDifficulty } from '../types';
 import InfoModal from '../components/InfoModal';
+import PlaylistModal from '../components/PlaylistModal';
 import './LobbyPage.css';
 
 interface Props {
@@ -33,6 +34,7 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('easy');
   const [addBots, setAddBots] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
 
   const handleCreate = () => {
@@ -105,6 +107,9 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
           <button className="btn btn-ghost" onClick={() => setShowHowToPlay(true)}>
             📖 게임 방법
           </button>
+          <button className="btn btn-ghost" onClick={() => setShowPlaylist(true)}>
+            🎵 음악
+          </button>
           <button className="btn btn-ghost" onClick={() => setShowAbout(true)}>
             💡 제작계기 & 후원
           </button>
@@ -150,6 +155,9 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
             최저 점수를 목표로 하세요!
           </p>
         </InfoModal>
+
+        {/* 플레이리스트 모달 */}
+        <PlaylistModal isOpen={showPlaylist} onClose={() => setShowPlaylist(false)} />
 
         {/* 제작계기 & 후원 모달 */}
         <InfoModal isOpen={showAbout} onClose={() => setShowAbout(false)} title="제작계기 & 후원">

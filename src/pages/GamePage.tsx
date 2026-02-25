@@ -8,7 +8,12 @@ import ToastContainer, { type ToastItem } from '../components/Toast';
 import TurnIndicator from '../components/TurnIndicator';
 import CountdownBar from '../components/CountdownBar';
 import GlobalChat from '../components/GlobalChat';
+import MusicToggle from '../components/MusicToggle';
 import type { ChatMessage } from '../types';
+import {
+  playCardFlip, playCardDeal, playMyTurn, playThankYou,
+  playSwap, playDiscard, playRoundEnd, playTimerWarning,
+} from '../utils/sfx';
 import './GamePage.css';
 
 const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐯','🐮'];
@@ -116,6 +121,7 @@ export default function GamePage({
     if (curr === 'peeking' && prev !== 'peeking') {
       setDealing(true);
       setPeekedCards(new Set());
+      playCardDeal();
       // Show advanced mode popup on first round only
       if (gameState.roomOptions.gameMode === 'advanced' && !advancedPopupShownRef.current) {
         advancedPopupShownRef.current = true;
@@ -127,6 +133,7 @@ export default function GamePage({
     // Show chat available toast when round scoring starts
     if (curr === 'round_scoring' && prev !== 'round_scoring') {
       setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '💬 채팅이 가능합니다!', type: 'info' }]);
+      playRoundEnd();
     }
     prevPhaseRef.current = curr;
   }, [gameState.phase, gameState.roomOptions.gameMode]);
@@ -156,6 +163,28 @@ export default function GamePage({
     }
   }, [gameState.actionLog.length]);
 
+  // SFX: play chime when it becomes my turn
+  const prevIsMyTurnRef = useRef(isMyTurn);
+  useEffect(() => {
+    if (isMyTurn && !prevIsMyTurnRef.current) {
+      playMyTurn();
+    }
+    prevIsMyTurnRef.current = isMyTurn;
+  }, [isMyTurn]);
+
+  // SFX: timer warning when <=5 seconds remain
+  useEffect(() => {
+    if (!gameState.timerEnd) return;
+    const checkTimer = () => {
+      const remaining = Math.max(0, gameState.timerEnd! - Date.now());
+      if (remaining > 0 && remaining <= 5000) {
+        playTimerWarning();
+      }
+    };
+    const interval = setInterval(checkTimer, 1000);
+    return () => clearInterval(interval);
+  }, [gameState.timerEnd]);
+
   const removeToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
@@ -165,6 +194,7 @@ export default function GamePage({
     // Front row = bottom row (positions cols ... cardCount-1)
     // Back row = top row (positions 0 ... cols-1) — cannot peek
     if (position < cols) return;
+    playCardFlip();
     setPeekedCards((prev) => {
       const next = new Set(prev);
       next.add(position);
@@ -182,17 +212,20 @@ export default function GamePage({
   const handleMyCardClick = useCallback((position: number) => {
     if (myTurnPhase === 'select_own_card' || myTurnPhase === 'drawn_card_action') {
       if (actionMode === 'swap') {
+        playSwap();
         onSwapCard(position);
         setActionMode(null);
       } else if (actionMode === 'discard') {
         // Can only flip face-down cards
         const card = myCards.find((c) => c.position === position);
         if (card && !card.faceUp) {
+          playDiscard();
           onDiscardAndFlip(position);
           setActionMode(null);
         }
       } else if (myTurnPhase === 'select_own_card') {
         // From discard pile (must swap)
+        playSwap();
         onSwapCard(position);
         setActionMode(null);
       }
@@ -418,7 +451,8 @@ export default function GamePage({
         </div>
         <div className="header-right">
           {me && <span className="my-score">{me.totalScore}점</span>}
-          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>📊</button>
+          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>점수판 📊</button>
+          <MusicToggle />
         </div>
       </div>
 
@@ -449,14 +483,14 @@ export default function GamePage({
         <div className="piles-area">
           <DrawPile
             count={gameState.drawPileCount}
-            onClick={onDrawFromPile}
+            onClick={() => { playCardFlip(); onDrawFromPile(); }}
             highlighted={isMyTurn && myTurnPhase === 'draw_choice'}
             disabled={!isMyTurn || myTurnPhase !== 'draw_choice'}
           />
           <DiscardPile
             topCard={gameState.discardPileTop}
             count={gameState.discardPileCount}
-            onClick={onDrawFromDiscard}
+            onClick={() => { playCardFlip(); onDrawFromDiscard(); }}
             highlighted={isMyTurn && myTurnPhase === 'draw_choice' && gameState.discardPileCount > 0}
             disabled={!isMyTurn || myTurnPhase !== 'draw_choice' || gameState.discardPileCount === 0}
           />
@@ -484,7 +518,7 @@ export default function GamePage({
 
           {/* Thank You Button */}
           {myTurnPhase === 'thank_you' && (
-            <button className="btn thank-you-btn" onClick={onThankYouAck}>
+            <button className="btn thank-you-btn" onClick={() => { playThankYou(); onThankYouAck(); }}>
               땡큐! 🎉
             </button>
           )}
