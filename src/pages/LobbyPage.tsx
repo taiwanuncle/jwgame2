@@ -54,7 +54,7 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
     return (
       <div className="page lobby-page">
         <div className="lobby-title">
-          <span className="lobby-icon">🃏</span>
+          <span className="lobby-icon">⛳</span>
           <h1>Golf Card Game</h1>
           <p className="text-muted">낮은 점수를 만들어라!</p>
         </div>

@@ -248,14 +248,18 @@
 }
 
 .back-symbol {
-  font-size: 1.8em;
-  opacity: 0.5;
+  font-size: 1em;
+  opacity: 0.4;
+  letter-spacing: 2px;
+  line-height: 1;
 }
 .card-sm .back-symbol {
-  font-size: 1.2em;
+  font-size: 0.7em;
+  letter-spacing: 1px;
 }
 .card-lg .back-symbol {
-  font-size: 2.4em;
+  font-size: 1.3em;
+  letter-spacing: 3px;
 }
 
 /* === Known Card Memo (peeked card indicator on card back) === */

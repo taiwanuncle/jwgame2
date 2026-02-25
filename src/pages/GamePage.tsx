@@ -90,6 +90,7 @@ export default function GamePage({
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [dealing, setDealing] = useState(true);
   const [showAdvancedPopup, setShowAdvancedPopup] = useState(false);
+  const [showScoreboard, setShowScoreboard] = useState(false);
   const advancedPopupShownRef = useRef(false);
   const prevLogLenRef = useRef(gameState.actionLog.length);
   const prevPhaseRef = useRef(gameState.phase);
@@ -122,6 +123,10 @@ export default function GamePage({
       }
       const timer = setTimeout(() => setDealing(false), 800);
       return () => clearTimeout(timer);
+    }
+    // Show chat available toast when round scoring starts
+    if (curr === 'round_scoring' && prev !== 'round_scoring') {
+      setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '💬 채팅이 가능합니다!', type: 'info' }]);
     }
     prevPhaseRef.current = curr;
   }, [gameState.phase, gameState.roomOptions.gameMode]);
@@ -346,6 +351,41 @@ export default function GamePage({
         <AdvancedModePopup onClose={() => setShowAdvancedPopup(false)} />
       )}
 
+      {/* Scoreboard Modal */}
+      {showScoreboard && (
+        <div className="advanced-popup-overlay" onClick={() => setShowScoreboard(false)}>
+          <div className="scoreboard-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>📊 점수판</h3>
+            <table className="scoreboard-table">
+              <thead>
+                <tr>
+                  <th>플레이어</th>
+                  {Array.from({ length: gameState.currentRound }, (_, i) => (
+                    <th key={i}>R{i + 1}</th>
+                  ))}
+                  <th>합계</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...gameState.players].sort((a, b) => a.totalScore - b.totalScore).map((p) => (
+                  <tr key={p.id} className={p.id === gameState.myId ? 'my-row' : ''}>
+                    <td className="sb-name">{p.nickname}</td>
+                    {p.roundScores.map((s, i) => (
+                      <td key={i}>{s}</td>
+                    ))}
+                    {Array.from({ length: gameState.currentRound - p.roundScores.length }, (_, i) => (
+                      <td key={`e${i}`}>-</td>
+                    ))}
+                    <td className="sb-total">{p.totalScore}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button className="btn btn-primary" onClick={() => setShowScoreboard(false)}>닫기</button>
+          </div>
+        </div>
+      )}
+
       {/* Toasts */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
@@ -377,7 +417,8 @@ export default function GamePage({
           )}
         </div>
         <div className="header-right">
-          {me && <span className="my-score">내 점수: {me.totalScore}</span>}
+          {me && <span className="my-score">{me.totalScore}점</span>}
+          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>📊</button>
         </div>
       </div>
 
@@ -505,8 +546,6 @@ export default function GamePage({
         )}
       </div>
 
-      {/* Chat */}
-      <GlobalChat messages={chatMessages} onSend={onSendChat} myId={gameState.myId} />
     </div>
   );
 }

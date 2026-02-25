@@ -116,7 +116,7 @@ export default function PlayingCard({
         <div className="card-back">
           <div className="back-pattern">
             <div className="back-inner">
-              <span className="back-symbol">🃏</span>
+              <span className="back-symbol">♠♥♦♣</span>
             </div>
           </div>
           {knownCard && (

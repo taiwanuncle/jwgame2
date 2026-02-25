@@ -16,8 +16,8 @@ function ToastMessage({ toast, onRemove }: { toast: ToastItem; onRemove: () => v
   const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setExiting(true), 2500);
-    const removeTimer = setTimeout(onRemove, 3000);
+    const timer = setTimeout(() => setExiting(true), 1200);
+    const removeTimer = setTimeout(onRemove, 1600);
     return () => {
       clearTimeout(timer);
       clearTimeout(removeTimer);

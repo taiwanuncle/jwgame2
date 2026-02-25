@@ -70,8 +70,10 @@ function App() {
       <GameOverPage
         gameState={gameState}
         roundResult={roundResult}
+        chatMessages={chatMessages}
         onPlayAgain={playAgain}
         onBackToLobby={leaveRoom}
+        onSendChat={sendChat}
       />
     );
   }

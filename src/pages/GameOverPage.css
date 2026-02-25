@@ -1,13 +1,50 @@
 .gameover-page {
   justify-content: center;
-  gap: var(--gap-xl);
+  gap: var(--gap-lg);
   max-width: 480px;
   margin: 0 auto;
   width: 100%;
+  padding-bottom: 52px;
 }
 .gameover-page h1 {
   font-size: var(--font-size-2xl);
   text-align: center;
+}
+
+/* Winner highlight */
+.gameover-winner {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: var(--gap-md) var(--gap-xl);
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 30px rgba(255, 165, 0, 0.3);
+  width: 100%;
+}
+.winner-avatar {
+  font-size: 48px;
+}
+.winner-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.winner-label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+}
+.winner-name {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.winner-score {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: #1a1a2e;
 }
 
 .final-ranking {
@@ -45,10 +82,28 @@
   flex: 1;
   font-weight: 600;
 }
+.rank-rounds {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  justify-content: flex-end;
+}
+.rank-round-score {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  min-width: 20px;
+  text-align: center;
+}
+.rank-row.is-me {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
 .rank-score {
   font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--accent);
+  min-width: 48px;
+  text-align: right;
 }
 
 .gameover-actions {

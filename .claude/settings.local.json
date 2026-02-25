@@ -5,7 +5,20 @@
       "Bash(npm install)",
       "Bash(npx tsc --noEmit)",
       "Bash(npx vite build)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git config user.email \"atshane81@gmail.com\")",
+      "Bash(git config user.name \"taiwanuncle\")",
+      "Bash(git commit -m \"Golf Card Game - initial deploy\")",
+      "Bash(git add package.json)",
+      "Bash(git commit -m \"Fix Render build: install devDependencies during build\")",
+      "Bash(git push)",
+      "Bash(git add src/components/CardGrid.tsx)",
+      "Bash(git commit -m \"Fix unused variable in CardGrid\")",
+      "Bash(git add server/index.js)",
+      "Bash(git commit -m \"Fix Express 5 wildcard route syntax\")",
+      "Bash(npm install canvas-confetti)",
+      "Bash(npm install -D @types/canvas-confetti)",
+      "Bash(git add -A)"
     ]
   }
 }

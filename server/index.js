@@ -771,6 +771,42 @@ function botTurnEasy(room, botPlayer) {
   }
 }
 
+function botFindPairTarget(cards, rank) {
+  // Find a known card with same rank to pair with
+  return cards.find((c) => c.faceUp && c.card && c.card.rank === rank);
+}
+
+function botFindSwapTarget(cards, drawnRank, drawnValue) {
+  // Priority 1: Pair — find a known card with same rank, swap its non-paired neighbor
+  const pairMatch = botFindPairTarget(cards, drawnRank);
+  if (pairMatch) {
+    // Find the worst non-paired card to replace
+    let worstPos = -1;
+    let worstVal = -1;
+    for (const c of cards) {
+      if (c.position === pairMatch.position) continue; // Don't swap the pair partner
+      const v = c.faceUp && c.card ? getCardValue(c.card.rank) : 6;
+      if (v > worstVal) {
+        worstVal = v;
+        worstPos = c.position;
+      }
+    }
+    return worstPos >= 0 ? worstPos : cards[0].position;
+  }
+
+  // Priority 2: Swap with the worst known card (if drawn is better)
+  let worstPos = 0;
+  let worstValue = -1;
+  for (const c of cards) {
+    const v = c.faceUp && c.card ? getCardValue(c.card.rank) : 6;
+    if (v > worstValue) {
+      worstValue = v;
+      worstPos = c.position;
+    }
+  }
+  return worstPos;
+}
+
 function botTurnMedium(room, botPlayer) {
   const playerId = botPlayer.id;
   const roomCode = room.roomCode;
@@ -785,7 +821,7 @@ function botTurnMedium(room, botPlayer) {
       : null;
   const discardValue = discardTop ? getCardValue(discardTop.rank) : 99;
 
-  // Check if discard card creates a pair with any known card
+  // Check if discard creates a pair
   let discardCreatesPair = false;
   if (discardTop) {
     discardCreatesPair = knownCards.some(
@@ -793,9 +829,12 @@ function botTurnMedium(room, botPlayer) {
     );
   }
 
+  // Check if discard is 10 or K (0 points — always great)
+  const discardIsZero = discardTop && (discardTop.rank === "10" || discardTop.rank === "K");
+
   const takeDiscard =
     discardTop &&
-    (discardValue <= 4 || discardCreatesPair) &&
+    (discardCreatesPair || discardIsZero || discardValue <= 3) &&
     room.discardPile.length > 0;
 
   if (takeDiscard) {
@@ -805,17 +844,8 @@ function botTurnMedium(room, botPlayer) {
       thankYouAckInternal(room, playerId);
       setTimeout(() => {
         if (!rooms.has(roomCode) || room.currentTurnPlayerId !== playerId) return;
-        // Swap with the highest-value known card, or an unknown card
-        let bestPos = 0;
-        let bestScore = -999;
-        for (const c of cards) {
-          const score = c.faceUp && c.card ? getCardValue(c.card.rank) : 5;
-          if (score > bestScore) {
-            bestScore = score;
-            bestPos = c.position;
-          }
-        }
-        swapCardInternal(room, playerId, bestPos);
+        const targetPos = botFindSwapTarget(cards, discardTop.rank, discardValue);
+        swapCardInternal(room, playerId, targetPos);
       }, 600 + Math.random() * 400);
     }, 600 + Math.random() * 400);
   } else {
@@ -826,8 +856,15 @@ function botTurnMedium(room, botPlayer) {
       const drawnCard = botPlayer.drawnCard;
       if (!drawnCard) return;
       const drawnValue = getCardValue(drawnCard.rank);
+      const drawnRank = drawnCard.rank;
 
-      // Find worst card position
+      // Check if drawn card creates a pair
+      const drawnCreatesPair = knownCards.some(
+        (c) => c.card && c.card.rank === drawnRank
+      );
+      const drawnIsZero = drawnRank === "10" || drawnRank === "K";
+
+      // Find worst card
       let worstPos = 0;
       let worstValue = -1;
       for (const c of cards) {
@@ -838,20 +875,20 @@ function botTurnMedium(room, botPlayer) {
         }
       }
 
-      if (drawnValue <= 5 && worstValue > drawnValue) {
-        // Good card — swap with worst
-        swapCardInternal(room, playerId, worstPos);
+      if (drawnCreatesPair || drawnIsZero || (drawnValue <= 4 && worstValue > drawnValue)) {
+        // Good card — swap smartly
+        const targetPos = botFindSwapTarget(cards, drawnRank, drawnValue);
+        swapCardInternal(room, playerId, targetPos);
       } else {
         // Bad card — discard and flip unknown
         if (unknownCards.length > 0) {
-          const pick =
-            unknownCards[Math.floor(Math.random() * unknownCards.length)];
+          const pick = unknownCards[Math.floor(Math.random() * unknownCards.length)];
           discardAndFlipInternal(room, playerId, pick.position);
         } else {
-          // All face up — swap if drawn is better than worst
           if (drawnValue < worstValue) {
             swapCardInternal(room, playerId, worstPos);
           } else {
+            // Discard not possible (all face up) — swap worst
             swapCardInternal(room, playerId, worstPos);
           }
         }
