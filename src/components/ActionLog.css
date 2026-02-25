@@ -1,0 +1,54 @@
+.action-log {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.log-header {
+  padding: var(--gap-sm) var(--gap-md);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.log-entries {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 200px;
+  padding: var(--gap-xs);
+}
+
+.log-empty {
+  padding: var(--gap-md);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.log-entry {
+  padding: var(--gap-xs) var(--gap-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-entry.alert {
+  background: rgba(255, 167, 38, 0.1);
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.log-text {
+  line-height: 1.4;
+}

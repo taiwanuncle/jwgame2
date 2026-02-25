@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest . -- --template react-ts)",
+      "Bash(npm install)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx vite build)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

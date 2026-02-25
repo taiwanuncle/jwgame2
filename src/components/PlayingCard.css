@@ -1,0 +1,291 @@
+/* === Card Sizes === */
+.playing-card {
+  position: relative;
+  border-radius: 10px;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.card-sm {
+  width: 52px;
+  height: 76px;
+  font-size: 10px;
+  border-radius: 7px;
+}
+.card-md {
+  width: 72px;
+  height: 104px;
+  font-size: 13px;
+}
+.card-lg {
+  width: 96px;
+  height: 136px;
+  font-size: 16px;
+}
+
+/* === Face Up === */
+.playing-card.face-up {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f8f0 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.playing-card.red { color: #c41e3a; }
+.playing-card.black { color: #1a1a2e; }
+
+/* === Face Down === */
+.playing-card.face-down {
+  background: linear-gradient(135deg, #1a3a6e 0%, #1e4d8e 40%, #1a3a6e 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* === States === */
+.playing-card.clickable {
+  cursor: pointer;
+}
+.playing-card.clickable:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.playing-card.clickable:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.playing-card.selected {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 28px rgba(76, 175, 80, 0.35);
+  outline: 3px solid #4caf50;
+}
+
+.playing-card.highlighted {
+  outline: 3px solid #ffa726;
+  animation: pulse-highlight 1.2s ease infinite;
+}
+
+.playing-card.dimmed {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.playing-card.disabled {
+  pointer-events: none;
+}
+
+.playing-card.selectable {
+  outline: 2px solid rgba(255, 167, 38, 0.5);
+}
+
+@keyframes pulse-highlight {
+  0%, 100% { outline-color: rgba(255, 167, 38, 0.5); }
+  50% { outline-color: rgba(255, 167, 38, 1); }
+}
+
+/* === Card Face Layout === */
+.card-face {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corner */
+.card-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+}
+.top-left {
+  top: 4px;
+  left: 5px;
+}
+.bottom-right {
+  bottom: 4px;
+  right: 5px;
+  transform: rotate(180deg);
+}
+
+.corner-rank {
+  font-weight: 800;
+  font-size: 1.15em;
+  letter-spacing: -0.02em;
+}
+.corner-suit {
+  font-size: 0.8em;
+  line-height: 1;
+  margin-top: -1px;
+}
+
+/* Center Suit Grid */
+.card-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58%;
+  height: 68%;
+  overflow: hidden;
+}
+
+.center-suit.large {
+  font-size: 3em;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.suit-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
+  width: 100%;
+}
+.suit-row {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  line-height: 1;
+}
+.grid-suit {
+  font-size: 1em;
+}
+
+/* Face Cards (J, Q, K) */
+.face-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.face-letter {
+  font-size: 2.4em;
+  font-weight: 900;
+  line-height: 1;
+  font-style: italic;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.06);
+}
+.face-suit {
+  font-size: 1.4em;
+  margin-top: -2px;
+}
+
+/* Size adjustments — small */
+.card-sm .corner-rank { font-size: 0.9em; }
+.card-sm .corner-suit { font-size: 0.65em; }
+.card-sm .center-suit.large { font-size: 2em; }
+.card-sm .grid-suit { font-size: 0.7em; }
+.card-sm .face-letter { font-size: 1.6em; }
+.card-sm .face-suit { font-size: 1em; }
+.card-sm .card-corner { top: 2px; left: 2px; }
+.card-sm .bottom-right { bottom: 2px; right: 2px; }
+
+/* Size adjustments — large */
+.card-lg .corner-rank { font-size: 1.35em; }
+.card-lg .corner-suit { font-size: 0.95em; }
+.card-lg .center-suit.large { font-size: 4em; }
+.card-lg .grid-suit { font-size: 1.15em; }
+.card-lg .face-letter { font-size: 3em; }
+.card-lg .face-suit { font-size: 2em; }
+.card-lg .top-left { top: 5px; left: 6px; }
+.card-lg .bottom-right { bottom: 5px; right: 6px; }
+
+/* === Card Back === */
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  padding: 4px;
+}
+
+.back-pattern {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.03) 4px,
+      rgba(255, 255, 255, 0.03) 8px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.03) 4px,
+      rgba(255, 255, 255, 0.03) 8px
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-inner {
+  width: 55%;
+  height: 45%;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.back-symbol {
+  font-size: 1.8em;
+  opacity: 0.5;
+}
+.card-sm .back-symbol {
+  font-size: 1.2em;
+}
+.card-lg .back-symbol {
+  font-size: 2.4em;
+}
+
+/* === Known Card Memo (peeked card indicator on card back) === */
+.card-memo {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.card-memo.memo-red {
+  color: #ff6b6b;
+}
+.card-sm .card-memo {
+  font-size: 8px;
+  padding: 1px 3px;
+  bottom: 3px;
+  right: 3px;
+}
+.card-lg .card-memo {
+  font-size: 14px;
+  padding: 2px 6px;
+  bottom: 6px;
+  right: 6px;
+}
