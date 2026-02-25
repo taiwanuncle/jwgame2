@@ -1359,7 +1359,7 @@ function adjustRounds(room) {
 }
 
 // SPA fallback — serve index.html for all non-API/non-socket routes
-app.get("*", (req, res) => {
+app.get("/{*splat}", (req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
 
