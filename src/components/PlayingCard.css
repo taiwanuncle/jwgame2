@@ -98,7 +98,7 @@
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   object-fit: cover;
-  object-position: center 65%;
+  object-position: center 75%;
   border-radius: inherit;
   display: block;
 }
