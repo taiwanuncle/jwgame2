@@ -387,7 +387,7 @@ export default function GamePage({
             </motion.div>
           )}
           <div className="score-results">
-            {roundResult.playerScores
+            {[...roundResult.playerScores]
               .sort((a, b) => a.finalScore - b.finalScore)
               .map((ps, i) => (
                 <motion.div
@@ -456,7 +456,7 @@ export default function GamePage({
               onClick={onNextRound}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.4 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

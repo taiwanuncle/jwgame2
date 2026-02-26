@@ -237,6 +237,8 @@
   align-items: center;
   gap: var(--gap-lg);
   padding: var(--gap-xl);
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 .scoring-overlay h2 {
