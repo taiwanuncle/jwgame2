@@ -480,12 +480,14 @@ export default function GamePage({
                 : 'sm';
 
               return roundResult.playerScores.map((ps, pi) => {
-                // Build pair color map: array index → color (server uses array index for positions)
+                // Build pair info map: array index → { color, isZero }
                 const PAIR_COLORS = ['#4caf50', '#ff9800', '#e91e63'];
-                const pairColorMap = new Map<number, string>();
+                const ZERO_PAIR_COLOR = '#78909c';
+                const pairInfoMap = new Map<number, { color: string; isZero: boolean }>();
                 ps.pairBonuses.forEach((pb, pbi) => {
-                  const color = PAIR_COLORS[pbi % PAIR_COLORS.length];
-                  pb.positions.forEach(pos => pairColorMap.set(pos, color));
+                  const isZero = pb.saved === 0;
+                  const color = isZero ? ZERO_PAIR_COLOR : PAIR_COLORS[pbi % PAIR_COLORS.length];
+                  pb.positions.forEach(pos => pairInfoMap.set(pos, { color, isZero }));
                 });
 
                 return (
@@ -493,11 +495,11 @@ export default function GamePage({
                     <span className="reveal-name">{ps.nickname}</span>
                     <div className="reveal-cards">
                       {ps.cards.map((c, ci) => {
-                        const pairColor = pairColorMap.get(ci);
+                        const pairInfo = pairInfoMap.get(ci);
                         return (
                           <motion.div
                             key={c.position}
-                            className={`reveal-card-wrap${pairColor ? ' is-pair' : ''}`}
+                            className={`reveal-card-wrap${pairInfo ? ' is-pair' : ''}${pairInfo?.isZero ? ' zero-pair' : ''}`}
                             initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
                             animate={{ opacity: 1, rotateY: 0, scale: 1 }}
                             transition={{
@@ -512,7 +514,11 @@ export default function GamePage({
                               faceUp={true}
                               size={revealSize}
                             />
-                            {pairColor && <span className="pair-badge" style={{ background: pairColor }}>페어!</span>}
+                            {pairInfo && (
+                              <span className={`pair-badge${pairInfo.isZero ? ' zero' : ''}`} style={{ background: pairInfo.color }}>
+                                {pairInfo.isZero ? '0점!' : '페어!'}
+                              </span>
+                            )}
                           </motion.div>
                         );
                       })}
