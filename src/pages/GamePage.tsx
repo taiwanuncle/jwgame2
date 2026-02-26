@@ -103,7 +103,7 @@ export default function GamePage({
   const [showCardLog, setShowCardLog] = useState(false);
   const advancedPopupShownRef = useRef(false);
   const prevLogLenRef = useRef(gameState.actionLog.length);
-  const prevPhaseRef = useRef(gameState.phase);
+  const prevPhaseRef = useRef<string | null>(null);
 
   const me = gameState.players.find((p) => p.id === gameState.myId);
   const isHost = me?.isHost ?? false;
@@ -131,6 +131,16 @@ export default function GamePage({
       if (gameState.roomOptions.gameMode === 'advanced' && !advancedPopupShownRef.current) {
         advancedPopupShownRef.current = true;
         setShowAdvancedPopup(true);
+      }
+      // Show multiplier toast for advanced mode
+      if (gameState.roomOptions.gameMode === 'advanced') {
+        const totalR = gameState.roomOptions.totalRounds;
+        const curR = gameState.currentRound;
+        if (curR === totalR) {
+          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '🔥 마지막 라운드! 점수 x3!!', type: 'alert' }]);
+        } else if (curR === totalR - 1) {
+          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '⚡ 이번 라운드 점수 x2!', type: 'alert' }]);
+        }
       }
       const timer = setTimeout(() => setDealing(false), 800);
       return () => clearTimeout(timer);
@@ -259,13 +269,15 @@ export default function GamePage({
   // === Card click handler for swap/flip ===
   const handleMyCardClick = useCallback((position: number) => {
     if (myTurnPhase === 'select_own_card' || myTurnPhase === 'drawn_card_action') {
+      const card = myCards.find((c) => c.position === position);
+      // Cannot swap or flip already face-up cards
+      if (card && card.faceUp) return;
+
       if (actionMode === 'swap') {
         playSwap();
         onSwapCard(position);
         setActionMode(null);
       } else if (actionMode === 'discard') {
-        // Can only flip face-down cards
-        const card = myCards.find((c) => c.position === position);
         if (card && !card.faceUp) {
           playDiscard();
           onDiscardAndFlip(position);
@@ -288,11 +300,11 @@ export default function GamePage({
     if (!isMyTurn) return [];
 
     if (myTurnPhase === 'select_own_card') {
-      return myCards.map((c) => c.position);
+      return myCards.filter((c) => !c.faceUp).map((c) => c.position);
     }
     if (myTurnPhase === 'drawn_card_action') {
       if (actionMode === 'swap') {
-        return myCards.map((c) => c.position);
+        return myCards.filter((c) => !c.faceUp).map((c) => c.position);
       }
       if (actionMode === 'discard') {
         return myCards.filter((c) => !c.faceUp).map((c) => c.position);

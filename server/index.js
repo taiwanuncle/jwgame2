@@ -582,7 +582,7 @@ function swapCardInternal(room, playerId, position) {
   if (!player.drawnCard) return false;
 
   const targetSlot = player.cards.find((c) => c.position === position);
-  if (!targetSlot) return false;
+  if (!targetSlot || targetSlot.faceUp) return false;
 
   const replacedCard = targetSlot.card;
   room.discardPile.push(replacedCard);
@@ -1194,7 +1194,8 @@ io.on("connection", (socket) => {
     const allDone = room.players.every((p) => p.peekingDone || !p.connected);
     if (allDone) {
       room.phase = "playing";
-      const firstPlayer = getNextTurnPlayer(room, room.players[room.dealerIndex].id);
+      const dealer = room.players[room.dealerIndex];
+      const firstPlayer = (dealer && (dealer.connected || dealer.isBot)) ? dealer : getNextTurnPlayer(room, dealer.id);
       if (firstPlayer) {
         room.currentTurnPlayerId = firstPlayer.id;
         room.turnPhase = "draw_choice";
@@ -1365,7 +1366,8 @@ io.on("connection", (socket) => {
         .every((p) => p.peekingDone || !p.connected);
       if (allHumansDone) {
         room.players.forEach((p) => { p.peekingDone = true; });
-        const firstPlayer = getNextTurnPlayer(room, room.players[room.dealerIndex].id);
+        const dealer = room.players[room.dealerIndex];
+        const firstPlayer = (dealer && (dealer.connected || dealer.isBot)) ? dealer : getNextTurnPlayer(room, dealer.id);
         if (firstPlayer) {
           room.phase = "playing";
           room.currentTurnPlayerId = firstPlayer.id;
