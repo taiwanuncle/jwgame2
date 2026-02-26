@@ -337,32 +337,32 @@
 }
 .reveal-cards {
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 /* Pair highlight on reveal cards */
 .reveal-card-wrap {
   position: relative;
+  padding-bottom: 14px;
 }
-.reveal-card-wrap.is-pair {
-  border-radius: 9px;
-  outline: 3px solid var(--pair-color, #4caf50);
-  outline-offset: 1px;
+.reveal-card-wrap.is-pair .playing-card {
+  box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 10px var(--pair-color, #4caf50);
   animation: pair-glow 1.5s ease infinite;
 }
 @keyframes pair-glow {
-  0%, 100% { outline-color: var(--pair-color, #4caf50); }
-  50% { outline-color: color-mix(in srgb, var(--pair-color, #4caf50) 60%, white); }
+  0%, 100% { box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 10px var(--pair-color, #4caf50); }
+  50% { box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 18px var(--pair-color, #4caf50); }
 }
 .pair-badge {
   position: absolute;
-  bottom: -10px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   color: #fff;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 6px;
   white-space: nowrap;
   z-index: 1;

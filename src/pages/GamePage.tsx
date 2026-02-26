@@ -471,48 +471,56 @@ export default function GamePage({
               ))}
           </div>
           <div className="score-cards-reveal">
-            {roundResult.playerScores.map((ps, pi) => {
-              // Build pair color map: position → { color, rank }
-              const PAIR_COLORS = ['#4caf50', '#ff9800', '#e91e63'];
-              const pairColorMap = new Map<number, string>();
-              ps.pairBonuses.forEach((pb, pbi) => {
-                const color = PAIR_COLORS[pbi % PAIR_COLORS.length];
-                pb.positions.forEach(pos => pairColorMap.set(pos, color));
-              });
+            {(() => {
+              const playerCount = roundResult.playerScores.length;
+              const cardCount = gameState.roomOptions.cardCount;
+              const revealSize: 'sm' | 'md' | 'lg' =
+                playerCount <= 2 ? (cardCount === 4 ? 'lg' : 'md')
+                : playerCount <= 3 ? (cardCount === 4 ? 'md' : 'sm')
+                : 'sm';
 
-              return (
-                <div key={ps.playerId} className="reveal-player">
-                  <span className="reveal-name">{ps.nickname}</span>
-                  <div className="reveal-cards">
-                    {ps.cards.map((c, ci) => {
-                      const pairColor = pairColorMap.get(c.position);
-                      return (
-                        <motion.div
-                          key={c.position}
-                          className={`reveal-card-wrap${pairColor ? ' is-pair' : ''}`}
-                          style={pairColor ? { '--pair-color': pairColor } as React.CSSProperties : undefined}
-                          initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
-                          animate={{ opacity: 1, rotateY: 0, scale: 1 }}
-                          transition={{
-                            delay: pi * 0.3 + ci * 0.1 + 0.5,
-                            duration: 0.4,
-                            ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-                          }}
-                        >
-                          <PlayingCard
-                            suit={c.card.suit}
-                            rank={c.card.rank}
-                            faceUp={true}
-                            size="sm"
-                          />
-                          {pairColor && <span className="pair-badge" style={{ background: pairColor }}>페어!</span>}
-                        </motion.div>
-                      );
-                    })}
+              return roundResult.playerScores.map((ps, pi) => {
+                // Build pair color map: array index → color (server uses array index for positions)
+                const PAIR_COLORS = ['#4caf50', '#ff9800', '#e91e63'];
+                const pairColorMap = new Map<number, string>();
+                ps.pairBonuses.forEach((pb, pbi) => {
+                  const color = PAIR_COLORS[pbi % PAIR_COLORS.length];
+                  pb.positions.forEach(pos => pairColorMap.set(pos, color));
+                });
+
+                return (
+                  <div key={ps.playerId} className="reveal-player">
+                    <span className="reveal-name">{ps.nickname}</span>
+                    <div className="reveal-cards">
+                      {ps.cards.map((c, ci) => {
+                        const pairColor = pairColorMap.get(ci);
+                        return (
+                          <motion.div
+                            key={c.position}
+                            className={`reveal-card-wrap${pairColor ? ' is-pair' : ''}`}
+                            initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
+                            animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+                            transition={{
+                              delay: pi * 0.3 + ci * 0.1 + 0.5,
+                              duration: 0.4,
+                              ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+                            }}
+                          >
+                            <PlayingCard
+                              suit={c.card.suit}
+                              rank={c.card.rank}
+                              faceUp={true}
+                              size={revealSize}
+                            />
+                            {pairColor && <span className="pair-badge" style={{ background: pairColor }}>페어!</span>}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
           {isHost && (
             <motion.button
