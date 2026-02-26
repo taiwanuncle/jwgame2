@@ -99,7 +99,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        🏆 게임 종료!
+        <span style={{ WebkitTextFillColor: 'initial', backgroundClip: 'initial', WebkitBackgroundClip: 'initial', background: 'none' }}>🏆</span> 게임 종료!
       </motion.h1>
 
       {/* Winner highlight */}
