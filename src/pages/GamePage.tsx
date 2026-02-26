@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GameStateFromServer, RoundResult, PlayerCard, ActionLogEntry, Suit, Rank } from '../types';
 import PlayingCard from '../components/PlayingCard';
 import CardGrid from '../components/CardGrid';
+import OpponentCards from '../components/OpponentCards';
 import DrawPile from '../components/DrawPile';
 import DiscardPile from '../components/DiscardPile';
 import ToastContainer, { type ToastItem } from '../components/Toast';
@@ -9,6 +10,7 @@ import TurnIndicator from '../components/TurnIndicator';
 import CountdownBar from '../components/CountdownBar';
 import GlobalChat from '../components/GlobalChat';
 import MusicToggle from '../components/MusicToggle';
+import CardLogModal from '../components/CardLogModal';
 import type { ChatMessage } from '../types';
 import {
   playCardFlip, playCardDeal, playMyTurn, playThankYou,
@@ -96,6 +98,7 @@ export default function GamePage({
   const [dealing, setDealing] = useState(true);
   const [showAdvancedPopup, setShowAdvancedPopup] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
+  const [showCardLog, setShowCardLog] = useState(false);
   const advancedPopupShownRef = useRef(false);
   const prevLogLenRef = useRef(gameState.actionLog.length);
   const prevPhaseRef = useRef(gameState.phase);
@@ -419,6 +422,14 @@ export default function GamePage({
         </div>
       )}
 
+      {/* Card Log Modal */}
+      <CardLogModal
+        isOpen={showCardLog}
+        onClose={() => setShowCardLog(false)}
+        actionLog={gameState.actionLog}
+        myId={gameState.myId}
+      />
+
       {/* Toasts */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
@@ -452,6 +463,7 @@ export default function GamePage({
         <div className="header-right">
           {me && <span className="my-score">{me.totalScore}점</span>}
           <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>점수판 📊</button>
+          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowCardLog(true)}>로그 📋</button>
           <MusicToggle />
         </div>
       </div>
@@ -467,12 +479,12 @@ export default function GamePage({
               <span className="other-avatar">{AVATARS[p.avatarIndex] || '🎴'}</span>
               <span className="other-name">{p.nickname}</span>
               <span className="other-score">{p.totalScore}점</span>
+              {!p.connected && <span className="disconnect-badge">끊김</span>}
             </div>
-            <CardGrid
+            <OpponentCards
               cards={p.cards}
               cardCount={gameState.roomOptions.cardCount}
-              size="sm"
-              dealing={dealing}
+              playerCount={gameState.players.length}
             />
           </div>
         ))}

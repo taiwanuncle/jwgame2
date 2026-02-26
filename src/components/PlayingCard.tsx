@@ -24,24 +24,8 @@ const SUIT_SYMBOLS: Record<Suit, string> = {
   club: '\u2663',
 };
 
-// Number of suit symbols to show in the center based on rank
-function getSuitLayout(rank: Rank): { rows: number[][]; large?: boolean; face?: string } {
-  switch (rank) {
-    case 'A': return { rows: [[1]], large: true };
-    case '2': return { rows: [[1], [1]] };
-    case '3': return { rows: [[1], [1], [1]] };
-    case '4': return { rows: [[2], [2]] };
-    case '5': return { rows: [[2], [1], [2]] };
-    case '6': return { rows: [[2], [2], [2]] };
-    case '7': return { rows: [[2], [1], [2], [2]] };
-    case '8': return { rows: [[2], [2], [2], [2]] };
-    case '9': return { rows: [[2], [1], [2], [2], [2]] };
-    case '10': return { rows: [[2], [2], [2], [2], [2]] };
-    case 'J': return { rows: [], face: 'J' };
-    case 'Q': return { rows: [], face: 'Q' };
-    case 'K': return { rows: [], face: 'K' };
-    default: return { rows: [[1]] };
-  }
+function getCardImageUrl(suit: Suit, rank: Rank): string {
+  return `/cards/${suit}_${rank}.png`;
 }
 
 export default function PlayingCard({
@@ -59,7 +43,6 @@ export default function PlayingCard({
   knownCard,
 }: Props) {
   const isRed = suit === 'heart' || suit === 'diamond';
-  const suitSymbol = suit ? SUIT_SYMBOLS[suit] : '';
 
   const cardClasses = [
     'playing-card',
@@ -77,40 +60,13 @@ export default function PlayingCard({
   const cardContent = (
     <>
       {faceUp && suit && rank ? (
-        <div className="card-face">
-          {/* Top-left corner */}
-          <div className="card-corner top-left">
-            <span className="corner-rank">{rank}</span>
-            <span className="corner-suit">{suitSymbol}</span>
-          </div>
-
-          {/* Center content */}
-          <div className="card-center">
-            {getSuitLayout(rank).face ? (
-              <div className="face-card">
-                <span className="face-letter">{getSuitLayout(rank).face}</span>
-                <span className="face-suit">{suitSymbol}</span>
-              </div>
-            ) : getSuitLayout(rank).large ? (
-              <span className="center-suit large">{suitSymbol}</span>
-            ) : (
-              <div className="suit-grid">
-                {getSuitLayout(rank).rows.map((row, ri) => (
-                  <div key={ri} className="suit-row">
-                    {Array.from({ length: row[0] }, (_, ci) => (
-                      <span key={ci} className="grid-suit">{suitSymbol}</span>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Bottom-right corner */}
-          <div className="card-corner bottom-right">
-            <span className="corner-rank">{rank}</span>
-            <span className="corner-suit">{suitSymbol}</span>
-          </div>
+        <div className="card-face card-face-img">
+          <img
+            src={getCardImageUrl(suit, rank)}
+            alt={`${rank}${SUIT_SYMBOLS[suit]}`}
+            className="card-image"
+            draggable={false}
+          />
         </div>
       ) : (
         <div className="card-back">

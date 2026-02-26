@@ -651,6 +651,17 @@ function startTurnTimer(room) {
   const currentPlayer = room.players.find((p) => p.id === room.currentTurnPlayerId);
   if (!currentPlayer || currentPlayer.isBot) return; // No timer for bots
 
+  // Disconnected player: auto-play after 1 second instead of full timer
+  if (!currentPlayer.connected) {
+    room.timerEnd = Date.now() + 1000;
+    room.turnTimer = setTimeout(() => {
+      if (!rooms.has(room.roomCode)) return;
+      if (room.currentTurnPlayerId !== currentPlayer.id) return;
+      handleTimerExpired(room, currentPlayer);
+    }, 1000);
+    return;
+  }
+
   room.timerEnd = Date.now() + TURN_TIMER_SECONDS * 1000;
 
   room.turnTimer = setTimeout(() => {
@@ -1336,13 +1347,45 @@ io.on("connection", (socket) => {
       return;
     }
 
+    // If it's the disconnected player's turn, auto-play immediately
+    if (room.currentTurnPlayerId === playerId &&
+        (room.phase === "playing" || room.phase === "last_turn")) {
+      clearTurnTimer(room);
+      setTimeout(() => {
+        if (!rooms.has(room.roomCode)) return;
+        if (room.currentTurnPlayerId !== playerId) return;
+        handleTimerExpired(room, player);
+      }, 1000); // 1 second delay for visual feedback
+    }
+
+    // If all human players in peeking phase have peeked or disconnected, proceed
+    if (room.phase === "peeking") {
+      const allHumansDone = room.players
+        .filter((p) => !p.isBot)
+        .every((p) => p.peekingDone || !p.connected);
+      if (allHumansDone) {
+        room.players.forEach((p) => { p.peekingDone = true; });
+        const firstPlayer = getNextTurnPlayer(room, room.players[room.dealerIndex].id);
+        if (firstPlayer) {
+          room.phase = "playing";
+          room.currentTurnPlayerId = firstPlayer.id;
+          room.turnPhase = "draw_choice";
+          startTurnTimer(room);
+        }
+        emitPersonalStates(room);
+        scheduleBotTurnIfNeeded(room);
+        return;
+      }
+    }
+
     emitPersonalStates(room);
 
-    const allDisconnected = room.players.every((p) => !p.connected);
+    const allDisconnected = room.players.every((p) => !p.connected && !p.isBot);
     if (allDisconnected) {
       setTimeout(() => {
         const existingRoom = rooms.get(room.roomCode);
-        if (existingRoom && existingRoom.players.every((p) => !p.connected)) {
+        if (existingRoom && existingRoom.players.every((p) => !p.connected && !p.isBot)) {
+          clearTurnTimer(existingRoom);
           rooms.delete(room.roomCode);
           broadcastRoomsToLobby();
         }

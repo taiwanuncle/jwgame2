@@ -116,117 +116,25 @@
   50% { outline-color: rgba(255, 167, 38, 1); }
 }
 
-/* === Card Face Layout === */
-.card-face {
+/* === Card Face Layout (Image) === */
+.card-face-img {
   width: 100%;
   height: 100%;
   position: relative;
-  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Corner */
-.card-corner {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.05;
-}
-.top-left {
-  top: 4px;
-  left: 5px;
-}
-.bottom-right {
-  bottom: 4px;
-  right: 5px;
-  transform: rotate(180deg);
-}
-
-.corner-rank {
-  font-weight: 800;
-  font-size: 1.15em;
-  letter-spacing: -0.02em;
-}
-.corner-suit {
-  font-size: 0.8em;
-  line-height: 1;
-  margin-top: -1px;
-}
-
-/* Center Suit Grid */
-.card-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 58%;
-  height: 68%;
   overflow: hidden;
+  border-radius: inherit;
 }
 
-.center-suit.large {
-  font-size: 3em;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12));
-}
-
-.suit-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
+.card-image {
+  width: 100%;
   height: 100%;
-  width: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
 }
-.suit-row {
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  line-height: 1;
-}
-.grid-suit {
-  font-size: 1em;
-}
-
-/* Face Cards (J, Q, K) */
-.face-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-.face-letter {
-  font-size: 2.4em;
-  font-weight: 900;
-  line-height: 1;
-  font-style: italic;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.06);
-}
-.face-suit {
-  font-size: 1.4em;
-  margin-top: -2px;
-}
-
-/* Size adjustments — small */
-.card-sm .corner-rank { font-size: 0.9em; }
-.card-sm .corner-suit { font-size: 0.65em; }
-.card-sm .center-suit.large { font-size: 2em; }
-.card-sm .grid-suit { font-size: 0.7em; }
-.card-sm .face-letter { font-size: 1.6em; }
-.card-sm .face-suit { font-size: 1em; }
-.card-sm .card-corner { top: 2px; left: 2px; }
-.card-sm .bottom-right { bottom: 2px; right: 2px; }
-
-/* Size adjustments — large */
-.card-lg .corner-rank { font-size: 1.35em; }
-.card-lg .corner-suit { font-size: 0.95em; }
-.card-lg .center-suit.large { font-size: 4em; }
-.card-lg .grid-suit { font-size: 1.15em; }
-.card-lg .face-letter { font-size: 3em; }
-.card-lg .face-suit { font-size: 2em; }
-.card-lg .top-left { top: 5px; left: 6px; }
-.card-lg .bottom-right { bottom: 5px; right: 6px; }
 
 /* === Card Back === */
 .card-back {

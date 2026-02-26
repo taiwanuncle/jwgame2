@@ -1,0 +1,102 @@
+.opponent-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.opc-row {
+  display: flex;
+  gap: 3px;
+}
+
+/* === Slot base === */
+.opc-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 4px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Face up */
+.opc-face-up {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.opc-face-up.opc-red {
+  color: #ff6b6b;
+}
+.opc-face-up.opc-black {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Face down */
+.opc-face-down {
+  background: linear-gradient(135deg, #1a3a6e, #1e4d8e);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.opc-hidden {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+}
+
+/* === Size: md (2 players) === */
+.opc-md .opc-slot {
+  width: 42px;
+  height: 28px;
+  font-size: 13px;
+}
+.opc-md .opc-suit {
+  font-size: 11px;
+}
+
+/* === Size: sm (3-4 players) === */
+.opc-sm .opc-slot {
+  width: 36px;
+  height: 24px;
+  font-size: 11px;
+}
+.opc-sm .opc-suit {
+  font-size: 9px;
+}
+
+/* === Size: xs (5+ players) === */
+.opc-xs .opc-slot {
+  width: 30px;
+  height: 20px;
+  font-size: 10px;
+  border-radius: 3px;
+}
+.opc-xs .opc-suit {
+  font-size: 8px;
+}
+.opc-xs .opc-row {
+  gap: 2px;
+}
+.opc-xs {
+  gap: 2px;
+}
+
+/* === Responsive: small screens === */
+@media (max-width: 600px) {
+  .opc-md .opc-slot {
+    width: 36px;
+    height: 24px;
+    font-size: 11px;
+  }
+  .opc-sm .opc-slot {
+    width: 32px;
+    height: 22px;
+    font-size: 10px;
+  }
+  .opc-xs .opc-slot {
+    width: 28px;
+    height: 18px;
+    font-size: 9px;
+  }
+}

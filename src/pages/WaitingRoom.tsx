@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { GameStateFromServer, RoomOptions, GameMode, CardCount } from '../types';
+import MusicToggle from '../components/MusicToggle';
 import './WaitingRoom.css';
 
 const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐯','🐮'];
@@ -43,6 +44,9 @@ export default function WaitingRoom({
 
   return (
     <div className="page waiting-page">
+      <div className="floating-music-toggle">
+        <MusicToggle />
+      </div>
       <div className="waiting-header">
         <button className="btn btn-ghost" onClick={onLeave}>← 나가기</button>
         <h2>대기실</h2>

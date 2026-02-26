@@ -52,6 +52,7 @@ export function useSocket() {
   const [errorMsg, setErrorMsg] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
+  const currentRoomRef = useRef<string | null>(null);
 
   useEffect(() => {
     const socket = io(SERVER_URL, {
@@ -74,6 +75,8 @@ export function useSocket() {
 
     socket.on('game_state', (state: GameStateFromServer) => {
       if (leavingRef.current) return;
+      // Ignore stale game_state from a room we already left
+      if (currentRoomRef.current && state.roomCode !== currentRoomRef.current) return;
       setGameState(state);
 
       if (state.phase === 'game_over') {
@@ -95,18 +98,21 @@ export function useSocket() {
 
     socket.on('room_created', ({ persistentId, roomCode }: { persistentId: string; roomCode: string }) => {
       leavingRef.current = false;
+      currentRoomRef.current = roomCode;
       sessionRef.current = { roomCode, persistentId };
       saveSession(roomCode, persistentId);
     });
 
     socket.on('room_joined', ({ persistentId, roomCode }: { persistentId: string; roomCode: string }) => {
       leavingRef.current = false;
+      currentRoomRef.current = roomCode;
       sessionRef.current = { roomCode, persistentId };
       saveSession(roomCode, persistentId);
     });
 
     socket.on('rejoin_success', ({ persistentId, roomCode }: { persistentId: string; roomCode: string }) => {
       leavingRef.current = false;
+      currentRoomRef.current = roomCode;
       sessionRef.current = { roomCode, persistentId };
       saveSession(roomCode, persistentId);
     });
@@ -154,6 +160,7 @@ export function useSocket() {
 
   const leaveRoom = useCallback(() => {
     leavingRef.current = true;
+    currentRoomRef.current = null;
     socketRef.current?.emit('leave_room');
     setGameState(null);
     setRoundResult(null);
@@ -195,6 +202,7 @@ export function useSocket() {
   const playAgain = useCallback(() => {
     socketRef.current?.emit('play_again');
     setRoundResult(null);
+    setChatMessages([]);
   }, []);
 
   const sendChat = useCallback((message: string) => {

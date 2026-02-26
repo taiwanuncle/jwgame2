@@ -291,3 +291,11 @@ input::placeholder {
   0%, 100% { box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); }
   50% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.4); }
 }
+
+/* Floating Music Toggle (Lobby / WaitingRoom) */
+.floating-music-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+}

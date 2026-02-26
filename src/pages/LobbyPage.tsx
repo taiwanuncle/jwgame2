@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { AvailableRoom, RoomOptions, GameMode, CardCount, BotDifficulty } from '../types';
 import InfoModal from '../components/InfoModal';
 import PlaylistModal from '../components/PlaylistModal';
+import MusicToggle from '../components/MusicToggle';
 import './LobbyPage.css';
 
 interface Props {
@@ -65,6 +66,9 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   if (mode === 'menu') {
     return (
       <div className="page lobby-page">
+        <div className="floating-music-toggle">
+          <MusicToggle />
+        </div>
         <motion.div
           className="lobby-title"
           initial={{ opacity: 0, scale: 0.85 }}
@@ -239,6 +243,9 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
 
   return (
     <div className="page lobby-page">
+      <div className="floating-music-toggle">
+        <MusicToggle />
+      </div>
       <motion.button
         className="btn btn-ghost back-btn"
         onClick={() => setMode('menu')}

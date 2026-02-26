@@ -1,0 +1,61 @@
+.card-log-modal {
+  background: var(--bg-card);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-lg);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-md);
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.2);
+}
+
+.card-log-modal h3 {
+  font-size: var(--font-size-lg);
+}
+
+.log-empty {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  padding: var(--gap-lg) 0;
+}
+
+.log-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 4px var(--gap-sm);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: var(--font-size-sm);
+}
+
+.log-card {
+  font-weight: 800;
+  min-width: 36px;
+  text-align: center;
+}
+
+.log-red {
+  color: #ff6b6b;
+}
+
+.log-black {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.log-detail {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
