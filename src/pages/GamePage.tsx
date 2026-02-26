@@ -482,7 +482,7 @@ export default function GamePage({
               return roundResult.playerScores.map((ps, pi) => {
                 // Build pair info map: array index → { color, isZero }
                 const PAIR_COLORS = ['#4caf50', '#ff9800', '#e91e63'];
-                const ZERO_PAIR_COLOR = '#78909c';
+                const ZERO_PAIR_COLOR = '#fdd835';
                 const pairInfoMap = new Map<number, { color: string; isZero: boolean }>();
                 ps.pairBonuses.forEach((pb, pbi) => {
                   const isZero = pb.saved === 0;

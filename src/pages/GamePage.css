@@ -355,9 +355,9 @@
   0%, 100% { box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 10px var(--pair-color, #4caf50); }
   50% { box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 18px var(--pair-color, #4caf50); }
 }
-/* Zero-point pair (K, 10) — subtle style */
+/* Zero-point pair (K, 10) — yellow style */
 .reveal-card-wrap.zero-pair .playing-card {
-  box-shadow: 0 0 0 2px #78909c, 0 0 6px rgba(120, 144, 156, 0.4);
+  box-shadow: 0 0 0 2px #fdd835, 0 0 6px rgba(253, 216, 53, 0.4);
 }
 .pair-badge {
   position: absolute;
@@ -365,18 +365,17 @@
   left: 50%;
   transform: translateX(-50%);
   color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 8px;
   white-space: nowrap;
   z-index: 1;
-  letter-spacing: 0.5px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .pair-badge.zero {
-  font-size: 8px;
-  opacity: 0.85;
+  font-size: 11px;
+  color: #1a1a2e;
 }
 
 /* === Advanced Mode Popup === */
