@@ -974,7 +974,7 @@ io.on("connection", (socket) => {
       roomOptions: {
         gameMode: (options && options.gameMode) || "normal",
         cardCount: (options && options.cardCount) || 4,
-        totalRounds: 2,
+        totalRounds: (options && options.totalRounds) || 2,
         singlePlayerMode: isSinglePlayer,
         botCount: (options && options.botCount) || 0,
         botDifficulty: (options && options.botDifficulty) || "easy",

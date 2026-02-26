@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { AvailableRoom, RoomOptions, GameMode, CardCount, BotDifficulty } from '../types';
 import InfoModal from '../components/InfoModal';
@@ -34,9 +34,19 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   const [botCount, setBotCount] = useState(3);
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('easy');
   const [addBots, setAddBots] = useState(false);
+  const [totalRounds, setTotalRounds] = useState(4);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+
+  // Auto-adjust totalRounds when botCount changes (must be divisible by player count)
+  useEffect(() => {
+    const playerTotal = botCount + 1;
+    if (totalRounds % playerTotal !== 0) {
+      const nearest = Math.round(totalRounds / playerTotal) * playerTotal;
+      setTotalRounds(Math.max(playerTotal, Math.min(playerTotal * 5, nearest || playerTotal)));
+    }
+  }, [botCount, totalRounds]);
 
   const handleCreate = () => {
     if (!nickname.trim()) return;
@@ -52,6 +62,7 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
     onCreateRoom(nickname.trim(), avatarIndex, {
       gameMode,
       cardCount,
+      totalRounds,
       singlePlayerMode: true,
       botCount,
       botDifficulty,
@@ -329,6 +340,17 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
               <div className="toggle-group">
                 <button className={`toggle-btn ${botDifficulty === 'easy' ? 'active' : ''}`} onClick={() => setBotDifficulty('easy')}>쉬움</button>
                 <button className={`toggle-btn ${botDifficulty === 'medium' ? 'active' : ''}`} onClick={() => setBotDifficulty('medium')}>보통</button>
+              </div>
+            </div>
+            <div className="option-group">
+              <label>라운드 수</label>
+              <div className="toggle-group">
+                {(() => {
+                  const playerTotal = botCount + 1;
+                  return Array.from({ length: 5 }, (_, i) => playerTotal * (i + 1)).map((r) => (
+                    <button key={r} className={`toggle-btn ${totalRounds === r ? 'active' : ''}`} onClick={() => setTotalRounds(r)}>{r}R</button>
+                  ));
+                })()}
               </div>
             </div>
             <motion.button className="btn btn-primary" onClick={handleStartSingle} disabled={!nickname.trim()} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
