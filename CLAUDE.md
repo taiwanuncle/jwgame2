@@ -66,8 +66,10 @@ jwgame2/
 │   │   ├── GameOverPage.tsx       # 게임 종료/결과 (confetti + SFX)
 │   │   └── GameOverPage.css
 │   ├── components/
-│   │   ├── PlayingCard.tsx        # 포커 카드 UI + PlayingCard.css
-│   │   ├── CardGrid.tsx           # 플레이어 카드 배열 (2x2 또는 2x3)
+│   │   ├── PlayingCard.tsx        # 포커 카드 UI (PNG 이미지) + PlayingCard.css
+│   │   ├── CardGrid.tsx           # 내 카드 배열 (2x2 또는 2x3)
+│   │   ├── OpponentCards.tsx      # 상대 카드 텍스트 표시 ("K♥") + .css
+│   │   ├── CardLogModal.tsx       # 카드 히스토리 로그 모달 + .css
 │   │   ├── DrawPile.tsx           # 뽑기 더미
 │   │   ├── DiscardPile.tsx        # 버리기 더미
 │   │   ├── Toast.tsx + .css       # 토스트 알림
@@ -75,7 +77,7 @@ jwgame2/
 │   │   ├── CountdownBar.tsx       # 턴 타이머
 │   │   ├── GlobalChat.tsx + .css  # 인게임 채팅
 │   │   ├── InfoModal.tsx + .css   # 정보 모달 (게임방법, 후원)
-│   │   ├── MusicToggle.tsx + .css # 음악 켜기/끄기 토글
+│   │   ├── MusicToggle.tsx + .css # 음악 켜기/끄기 토글 (로비/대기실/게임 공통)
 │   │   └── PlaylistModal.tsx + .css # 플레이리스트 모달
 │   ├── hooks/
 │   │   └── useSocket.ts           # Socket.io 통신 훅
@@ -157,8 +159,13 @@ jwgame2/
 
 ## 할 일 목록 (TODO)
 
-### 우선순위 높음
-1. **로비/대기실에 음악 토글(MusicToggle) 추가** — 현재 GamePage에만 있음, LobbyPage/WaitingRoom에도 필요
-2. **카드 숫자 잘림 수정** — 9, 10 등 큰 숫자가 카드 내부에서 잘림, PlayingCard 폰트/레이아웃 조정 필요
-3. **방 나가기/재생성 시 상태 깨끗이 정리** — 이전 방의 게임오버 축하 메시지가 다시 뜨는 문제, gameState 초기화 로직 점검
-4. **플레이어 연결 끊김(튕김) 처리** — 재접속 로직, 봇 대체, 방 안내 메시지 등 필요
+### 완료됨
+- ~~로비/대기실에 음악 토글 추가~~ ✅
+- ~~카드 이미지(PNG) 적용~~ ✅ (CSS 렌더링 → 실제 카드 이미지)
+- ~~상대패 텍스트 표시~~ ✅ ("K♥" 형태, 플레이어 수 반응형)
+- ~~카드 로그 버튼~~ ✅ (공개된 카드 히스토리 확인)
+- ~~방 나가기/재생성 시 상태 정리~~ ✅ (roomCode 기반 필터링)
+- ~~플레이어 연결 끊김 처리~~ ✅ (즉시 자동 플레이, 끊김 배지)
+
+### 대기중
+- **애니메이션/그래픽 업그레이드** — 토의 후 구현
