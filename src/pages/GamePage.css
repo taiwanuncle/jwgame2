@@ -356,7 +356,8 @@
   50% { box-shadow: 0 0 0 3px var(--pair-color, #4caf50), 0 0 18px var(--pair-color, #4caf50); }
 }
 /* Zero-point pair (K, 10) — yellow style */
-.reveal-card-wrap.zero-pair .playing-card {
+.reveal-card-wrap.zero-pair .playing-card,
+.reveal-card-wrap.zero-solo .playing-card {
   box-shadow: 0 0 0 2px #fdd835, 0 0 6px rgba(253, 216, 53, 0.4);
 }
 .pair-badge {

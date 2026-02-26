@@ -496,10 +496,11 @@ export default function GamePage({
                     <div className="reveal-cards">
                       {ps.cards.map((c, ci) => {
                         const pairInfo = pairInfoMap.get(ci);
+                        const isSoloZero = !pairInfo && (c.card.rank === 'K' || c.card.rank === '10');
                         return (
                           <motion.div
                             key={c.position}
-                            className={`reveal-card-wrap${pairInfo ? ' is-pair' : ''}${pairInfo?.isZero ? ' zero-pair' : ''}`}
+                            className={`reveal-card-wrap${pairInfo ? ' is-pair' : ''}${pairInfo?.isZero ? ' zero-pair' : ''}${isSoloZero ? ' zero-solo' : ''}`}
                             initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
                             animate={{ opacity: 1, rotateY: 0, scale: 1 }}
                             transition={{
@@ -518,6 +519,9 @@ export default function GamePage({
                               <span className={`pair-badge${pairInfo.isZero ? ' zero' : ''}`} style={{ background: pairInfo.color }}>
                                 {pairInfo.isZero ? '0점!' : '페어!'}
                               </span>
+                            )}
+                            {isSoloZero && (
+                              <span className="pair-badge zero" style={{ background: '#fdd835' }}>0점!</span>
                             )}
                           </motion.div>
                         );
