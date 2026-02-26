@@ -145,6 +145,8 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
             <li>버린 카드 더미에서 가져올 때는 <span className="highlight">땡큐!</span> 버튼을 눌러야 합니다.</li>
             <li>가져온 카드를 자기 카드와 <strong>교환</strong>하거나, 뽑기 더미에서 가져온 경우 <strong>버리고 한 장 뒤집기</strong>를 할 수 있습니다.</li>
             <li>버린 카드 더미에서 가져온 카드는 반드시 교환해야 합니다.</li>
+            <li><span className="highlight">이미 앞면인 카드는 교환할 수 없습니다.</span> (뒷면 카드만 교환 가능)</li>
+            <li>교환된 카드는 앞면으로 공개되어 버린 카드 더미에 놓입니다.</li>
             <li>모든 카드가 앞면이 되면 다른 플레이어들의 마지막 턴 1회 후 라운드가 종료됩니다.</li>
           </ol>
           <h3>점수 계산</h3>
@@ -160,9 +162,15 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
           </table>
           <h3>보너스</h3>
           <ul>
-            <li><strong>페어</strong>: 같은 숫자 카드 2장 = 두 카드 모두 0점</li>
-            <li><strong>스트레이트</strong> (상급자 모드): 연속된 4장 = 합계의 마이너스 점수</li>
-            <li><strong>라운드 배수</strong> (상급자 모드): 마지막 전 라운드 x2, 마지막 라운드 x3</li>
+            <li><strong>페어</strong>: 같은 숫자 카드 2장이 세로로 나란히 있으면 두 카드 모두 0점</li>
+            <li><strong>스트레이트</strong> (상급자 모드): 가로 한 줄이 연속 숫자 → 합계의 마이너스</li>
+            <li><strong>라운드 배수</strong> (상급자 모드): 끝에서 2번째 라운드 x2, 마지막 라운드 x3</li>
+          </ul>
+          <h3>기타 규칙</h3>
+          <ul>
+            <li>2~3인: 카드 1벌(52장) / 4인 이상: 카드 2벌(104장)</li>
+            <li>매 라운드 최저 점수 플레이어가 다음 라운드 선(첫 턴)</li>
+            <li>최저 점수가 승리, 동점이면 공동 우승</li>
           </ul>
           <h3>팁</h3>
           <p>
