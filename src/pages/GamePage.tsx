@@ -270,10 +270,13 @@ export default function GamePage({
   const handleMyCardClick = useCallback((position: number) => {
     if (myTurnPhase === 'select_own_card' || myTurnPhase === 'drawn_card_action') {
       const card = myCards.find((c) => c.position === position);
-      // Cannot swap or flip already face-up cards
-      if (card && card.faceUp) return;
 
       if (actionMode === 'swap') {
+        // From pile: prefer face-down, but allow face-up as fallback
+        if (card && card.faceUp) {
+          const hasFaceDown = myCards.some((c) => !c.faceUp);
+          if (hasFaceDown) return; // Block if face-down cards available
+        }
         playSwap();
         onSwapCard(position);
         setActionMode(null);
@@ -284,7 +287,7 @@ export default function GamePage({
           setActionMode(null);
         }
       } else if (myTurnPhase === 'select_own_card') {
-        // From discard pile (must swap)
+        // From discard pile (must swap) — allow any card
         playSwap();
         onSwapCard(position);
         setActionMode(null);
@@ -300,11 +303,14 @@ export default function GamePage({
     if (!isMyTurn) return [];
 
     if (myTurnPhase === 'select_own_card') {
-      return myCards.filter((c) => !c.faceUp).map((c) => c.position);
+      // From discard pile — must swap, allow all cards
+      return myCards.map((c) => c.position);
     }
     if (myTurnPhase === 'drawn_card_action') {
       if (actionMode === 'swap') {
-        return myCards.filter((c) => !c.faceUp).map((c) => c.position);
+        // From pile — prefer face-down, but allow face-up if no face-down left
+        const faceDown = myCards.filter((c) => !c.faceUp);
+        return faceDown.length > 0 ? faceDown.map((c) => c.position) : myCards.map((c) => c.position);
       }
       if (actionMode === 'discard') {
         return myCards.filter((c) => !c.faceUp).map((c) => c.position);

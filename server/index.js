@@ -582,7 +582,7 @@ function swapCardInternal(room, playerId, position) {
   if (!player.drawnCard) return false;
 
   const targetSlot = player.cards.find((c) => c.position === position);
-  if (!targetSlot || targetSlot.faceUp) return false;
+  if (!targetSlot) return false;
 
   const replacedCard = targetSlot.card;
   room.discardPile.push(replacedCard);
@@ -756,27 +756,30 @@ function botTurnEasy(room, botPlayer) {
       thankYouAckInternal(room, playerId);
       setTimeout(() => {
         if (!rooms.has(roomCode) || room.currentTurnPlayerId !== playerId) return;
-        const randomPos = Math.floor(Math.random() * botPlayer.cards.length);
-        swapCardInternal(room, playerId, randomPos);
+        // Prefer face-down cards for swap
+        const faceDown = botPlayer.cards.filter((c) => !c.faceUp);
+        const target = faceDown.length > 0
+          ? faceDown[Math.floor(Math.random() * faceDown.length)]
+          : botPlayer.cards[Math.floor(Math.random() * botPlayer.cards.length)];
+        swapCardInternal(room, playerId, target.position);
       }, 600 + Math.random() * 400);
     }, 600 + Math.random() * 400);
   } else {
     drawFromPileInternal(room, playerId);
     setTimeout(() => {
       if (!rooms.has(roomCode) || room.currentTurnPlayerId !== playerId) return;
+      const faceDownCards = botPlayer.cards.filter((c) => !c.faceUp);
       const doSwap = Math.random() < 0.5;
-      if (doSwap) {
+      if (doSwap && faceDownCards.length > 0) {
+        const pick = faceDownCards[Math.floor(Math.random() * faceDownCards.length)];
+        swapCardInternal(room, playerId, pick.position);
+      } else if (faceDownCards.length > 0) {
+        const pick = faceDownCards[Math.floor(Math.random() * faceDownCards.length)];
+        discardAndFlipInternal(room, playerId, pick.position);
+      } else {
+        // All face up — swap worst card
         const randomPos = Math.floor(Math.random() * botPlayer.cards.length);
         swapCardInternal(room, playerId, randomPos);
-      } else {
-        const faceDownCards = botPlayer.cards.filter((c) => !c.faceUp);
-        if (faceDownCards.length > 0) {
-          const pick = faceDownCards[Math.floor(Math.random() * faceDownCards.length)];
-          discardAndFlipInternal(room, playerId, pick.position);
-        } else {
-          const randomPos = Math.floor(Math.random() * botPlayer.cards.length);
-          swapCardInternal(room, playerId, randomPos);
-        }
       }
     }, 600 + Math.random() * 400);
   }
@@ -788,14 +791,16 @@ function botFindPairTarget(cards, rank) {
 }
 
 function botFindSwapTarget(cards, drawnRank, drawnValue) {
-  // Priority 1: Pair — find a known card with same rank, swap its non-paired neighbor
+  const faceDown = cards.filter((c) => !c.faceUp);
+
+  // Priority 1: Pair — find a known card with same rank, swap a face-down neighbor
   const pairMatch = botFindPairTarget(cards, drawnRank);
   if (pairMatch) {
-    // Find the worst non-paired card to replace
+    const candidates = faceDown.length > 0 ? faceDown : cards;
     let worstPos = -1;
     let worstVal = -1;
-    for (const c of cards) {
-      if (c.position === pairMatch.position) continue; // Don't swap the pair partner
+    for (const c of candidates) {
+      if (c.position === pairMatch.position) continue;
       const v = c.faceUp && c.card ? getCardValue(c.card.rank) : 6;
       if (v > worstVal) {
         worstVal = v;
@@ -805,7 +810,10 @@ function botFindSwapTarget(cards, drawnRank, drawnValue) {
     return worstPos >= 0 ? worstPos : cards[0].position;
   }
 
-  // Priority 2: Swap with the worst known card (if drawn is better)
+  // Priority 2: Prefer face-down cards, fallback to worst known card
+  if (faceDown.length > 0) {
+    return faceDown[Math.floor(Math.random() * faceDown.length)].position;
+  }
   let worstPos = 0;
   let worstValue = -1;
   for (const c of cards) {
