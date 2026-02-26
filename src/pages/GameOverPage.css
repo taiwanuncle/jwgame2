@@ -65,6 +65,43 @@
   color: #1a1a2e;
 }
 
+/* Co-winners layout */
+.co-winner-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-sm);
+  width: 100%;
+}
+.co-winner-list .winner-label {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.co-winner-players {
+  display: flex;
+  gap: var(--gap-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.co-winner-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-xs);
+}
+.co-winner-player .winner-avatar {
+  font-size: 40px;
+}
+.co-winner-player .winner-name {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.co-winner-list .winner-score {
+  font-size: var(--font-size-xl);
+}
+
 .final-ranking {
   width: 100%;
 }

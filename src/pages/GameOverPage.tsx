@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, ChatMessage } from '../types';
 import GlobalChat from '../components/GlobalChat';
+import MusicToggle from '../components/MusicToggle';
 import { playGameOver } from '../utils/sfx';
 import './GameOverPage.css';
 
@@ -19,7 +20,7 @@ interface Props {
 
 export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onBackToLobby, onSendChat }: Props) {
   const sortedPlayers = [...gameState.players].sort((a, b) => a.totalScore - b.totalScore);
-  const winner = sortedPlayers[0];
+  const winners = sortedPlayers.filter(p => p.totalScore === sortedPlayers[0]?.totalScore);
   const me = gameState.players.find(p => p.id === gameState.myId);
   const isHost = me?.isHost ?? false;
 
@@ -94,6 +95,9 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
 
   return (
     <div className="page gameover-page">
+      <div className="floating-music-toggle">
+        <MusicToggle />
+      </div>
       <motion.h1
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -102,20 +106,37 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
         <span style={{ WebkitTextFillColor: 'initial', backgroundClip: 'initial', WebkitBackgroundClip: 'initial', background: 'none' }}>🏆</span> 게임 종료!
       </motion.h1>
 
-      {/* Winner highlight */}
-      {winner && (
+      {/* Winner highlight — supports co-winners */}
+      {winners.length > 0 && (
         <motion.div
-          className="gameover-winner"
+          className={`gameover-winner ${winners.length > 1 ? 'co-winners' : ''}`}
           initial={{ opacity: 0, y: 30, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.6, type: 'spring', stiffness: 200, damping: 20 }}
         >
-          <span className="winner-avatar">{AVATARS[winner.avatarIndex] || '🎴'}</span>
-          <div className="winner-info">
-            <span className="winner-label">우승</span>
-            <span className="winner-name">{winner.nickname}</span>
-          </div>
-          <span className="winner-score">{winner.totalScore}점</span>
+          {winners.length === 1 ? (
+            <>
+              <span className="winner-avatar">{AVATARS[winners[0].avatarIndex] || '🎴'}</span>
+              <div className="winner-info">
+                <span className="winner-label">우승</span>
+                <span className="winner-name">{winners[0].nickname}</span>
+              </div>
+              <span className="winner-score">{winners[0].totalScore}점</span>
+            </>
+          ) : (
+            <div className="co-winner-list">
+              <span className="winner-label">공동 우승!</span>
+              <div className="co-winner-players">
+                {winners.map((w) => (
+                  <div key={w.id} className="co-winner-player">
+                    <span className="winner-avatar">{AVATARS[w.avatarIndex] || '🎴'}</span>
+                    <span className="winner-name">{w.nickname}</span>
+                  </div>
+                ))}
+              </div>
+              <span className="winner-score">{winners[0].totalScore}점</span>
+            </div>
+          )}
         </motion.div>
       )}
 
@@ -127,16 +148,23 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
       >
         <h2>최종 순위</h2>
         <div className="ranking-list">
-          {sortedPlayers.map((p, i) => (
+          {sortedPlayers.map((p, i) => {
+            // Calculate actual rank (tied players share same rank)
+            const rank = i === 0 ? 0 : (p.totalScore === sortedPlayers[i - 1].totalScore ? -1 : i);
+            const displayRank = rank === -1
+              ? (sortedPlayers.findIndex(s => s.totalScore === p.totalScore))
+              : rank;
+            const isWinner = p.totalScore === sortedPlayers[0].totalScore;
+            return (
             <motion.div
               key={p.id}
-              className={`rank-row ${i === 0 ? 'winner' : ''} ${p.id === gameState.myId ? 'is-me' : ''}`}
+              className={`rank-row ${isWinner ? 'winner' : ''} ${p.id === gameState.myId ? 'is-me' : ''}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
             >
               <span className="rank-num">
-                {i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}위`}
+                {displayRank === 0 ? '🏆' : displayRank === 1 ? '🥈' : displayRank === 2 ? '🥉' : `${displayRank + 1}위`}
               </span>
               <span className="rank-name">{p.nickname}</span>
               <div className="rank-rounds">
@@ -146,7 +174,8 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
               </div>
               <span className="rank-score">{p.totalScore}점</span>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
 
