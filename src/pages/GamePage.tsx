@@ -1,4 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, PlayerCard, ActionLogEntry, Suit, Rank } from '../types';
 import PlayingCard from '../components/PlayingCard';
 import CardGrid from '../components/CardGrid';
@@ -140,6 +142,49 @@ export default function GamePage({
     }
     prevPhaseRef.current = curr;
   }, [gameState.phase, gameState.roomOptions.gameMode]);
+
+  // === Scoring confetti for pairs/straights ===
+  useEffect(() => {
+    if (gameState.phase !== 'round_scoring' || !roundResult) return;
+    const hasPairs = roundResult.playerScores.some((ps) => ps.pairBonuses.length > 0);
+    const hasStraight = roundResult.playerScores.some((ps) => ps.straightBonus);
+    if (!hasPairs && !hasStraight) return;
+
+    // Delayed confetti burst for bonus scoring
+    const timer = setTimeout(() => {
+      if (hasStraight) {
+        // Big burst for straight
+        confetti({
+          particleCount: 60,
+          spread: 100,
+          origin: { x: 0.5, y: 0.5 },
+          colors: ['#007AFF', '#5AC8FA', '#34C759', '#FFD700'],
+          startVelocity: 25,
+        });
+      }
+      if (hasPairs) {
+        // Side sparkles for pairs
+        confetti({
+          particleCount: 30,
+          angle: 60,
+          spread: 50,
+          origin: { x: 0.15, y: 0.6 },
+          colors: ['#4caf50', '#81c784', '#FFD700'],
+        });
+        confetti({
+          particleCount: 30,
+          angle: 120,
+          spread: 50,
+          origin: { x: 0.85, y: 0.6 },
+          colors: ['#4caf50', '#81c784', '#FFD700'],
+        });
+      }
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [gameState.phase, roundResult]);
 
   // === Toast from action log changes ===
   useEffect(() => {
@@ -324,15 +369,34 @@ export default function GamePage({
     return (
       <div className="page game-page">
         <div className="scoring-overlay">
-          <h2>라운드 {roundResult.round} 결과</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+          >
+            라운드 {roundResult.round} 결과
+          </motion.h2>
           {roundResult.roundMultiplier > 1 && (
-            <div className="multiplier-badge">x{roundResult.roundMultiplier} 배수!</div>
+            <motion.div
+              className="multiplier-badge"
+              initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
+            >
+              x{roundResult.roundMultiplier} 배수!
+            </motion.div>
           )}
           <div className="score-results">
             {roundResult.playerScores
               .sort((a, b) => a.finalScore - b.finalScore)
               .map((ps, i) => (
-                <div key={ps.playerId} className={`score-row ${i === 0 ? 'winner' : ''}`}>
+                <motion.div
+                  key={ps.playerId}
+                  className={`score-row ${i === 0 ? 'winner' : ''}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.12, duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+                >
                   <span className="score-rank">{i === 0 ? '🏆' : `${i + 1}`}</span>
                   <span className="score-name">{ps.nickname}</span>
                   <div className="score-details">
@@ -347,32 +411,57 @@ export default function GamePage({
                       <span className="score-mult">x{ps.multiplier}</span>
                     )}
                   </div>
-                  <span className="score-final">{ps.finalScore}점</span>
-                </div>
+                  <motion.span
+                    className="score-final"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: i * 0.12 + 0.3, duration: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+                  >
+                    {ps.finalScore}점
+                  </motion.span>
+                </motion.div>
               ))}
           </div>
           <div className="score-cards-reveal">
-            {roundResult.playerScores.map((ps) => (
+            {roundResult.playerScores.map((ps, pi) => (
               <div key={ps.playerId} className="reveal-player">
                 <span className="reveal-name">{ps.nickname}</span>
                 <div className="reveal-cards">
-                  {ps.cards.map((c) => (
-                    <PlayingCard
+                  {ps.cards.map((c, ci) => (
+                    <motion.div
                       key={c.position}
-                      suit={c.card.suit}
-                      rank={c.card.rank}
-                      faceUp={true}
-                      size="sm"
-                    />
+                      initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
+                      animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+                      transition={{
+                        delay: pi * 0.3 + ci * 0.1 + 0.5,
+                        duration: 0.4,
+                        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+                      }}
+                    >
+                      <PlayingCard
+                        suit={c.card.suit}
+                        rank={c.card.rank}
+                        faceUp={true}
+                        size="sm"
+                      />
+                    </motion.div>
                   ))}
                 </div>
               </div>
             ))}
           </div>
           {isHost && (
-            <button className="btn btn-primary btn-large" onClick={onNextRound}>
+            <motion.button
+              className="btn btn-primary btn-large"
+              onClick={onNextRound}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.4 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               {gameState.currentRound >= gameState.roomOptions.totalRounds ? '최종 결과 보기' : '다음 라운드'}
-            </button>
+            </motion.button>
           )}
         </div>
         <GlobalChat messages={chatMessages} onSend={onSendChat} myId={gameState.myId} />
@@ -511,50 +600,87 @@ export default function GamePage({
 
       {/* Status Message */}
       <div className="status-bar">
-        <span className="status-text">{getStatusMessage()}</span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={getStatusMessage()}
+            className="status-text"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            {getStatusMessage()}
+          </motion.span>
+        </AnimatePresence>
       </div>
 
       {/* Drawn Card Area + Action Buttons */}
-      {isMyTurn && drawnCard && (
-        <div className="drawn-area">
-          <div className="drawn-card-display">
-            <span className="drawn-label">뽑은 카드</span>
-            <PlayingCard
-              suit={drawnCard.suit}
-              rank={drawnCard.rank}
-              faceUp={true}
-              size="lg"
-              selected
-            />
-          </div>
-
-          {/* Thank You Button */}
-          {myTurnPhase === 'thank_you' && (
-            <button className="btn thank-you-btn" onClick={() => { playThankYou(); onThankYouAck(); }}>
-              땡큐! 🎉
-            </button>
-          )}
-
-          {/* Action Choice (draw from pile: swap or discard) */}
-          {myTurnPhase === 'drawn_card_action' && drawSource === 'pile' && !actionMode && (
-            <div className="action-choice">
-              <button className="btn btn-primary" onClick={() => setActionMode('swap')}>
-                교환하기
-              </button>
-              <button className="btn btn-outline" onClick={() => setActionMode('discard')}>
-                버리기
-              </button>
+      <AnimatePresence>
+        {isMyTurn && drawnCard && (
+          <motion.div
+            className="drawn-area"
+            initial={{ opacity: 0, scale: 0.85, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -10 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          >
+            <div className="drawn-card-display">
+              <span className="drawn-label">뽑은 카드</span>
+              <motion.div
+                initial={{ rotateY: -90, scale: 0.7 }}
+                animate={{ rotateY: 0, scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+                style={{ perspective: 600 }}
+              >
+                <PlayingCard
+                  suit={drawnCard.suit}
+                  rank={drawnCard.rank}
+                  faceUp={true}
+                  size="lg"
+                  selected
+                />
+              </motion.div>
             </div>
-          )}
 
-          {/* Cancel action mode */}
-          {actionMode && (
-            <button className="btn btn-ghost" onClick={() => setActionMode(null)}>
-              취소
-            </button>
-          )}
-        </div>
-      )}
+            {/* Thank You Button */}
+            {myTurnPhase === 'thank_you' && (
+              <motion.button
+                className="btn thank-you-btn"
+                onClick={() => { playThankYou(); onThankYouAck(); }}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
+              >
+                땡큐! 🎉
+              </motion.button>
+            )}
+
+            {/* Action Choice (draw from pile: swap or discard) */}
+            {myTurnPhase === 'drawn_card_action' && drawSource === 'pile' && !actionMode && (
+              <motion.div
+                className="action-choice"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.3 }}
+              >
+                <button className="btn btn-primary" onClick={() => setActionMode('swap')}>
+                  교환하기
+                </button>
+                <button className="btn btn-outline" onClick={() => setActionMode('discard')}>
+                  버리기
+                </button>
+              </motion.div>
+            )}
+
+            {/* Cancel action mode */}
+            {actionMode && (
+              <button className="btn btn-ghost" onClick={() => setActionMode(null)}>
+                취소
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* My Cards */}
       <div className="my-cards-area">

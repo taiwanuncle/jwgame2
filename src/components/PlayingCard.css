@@ -1,38 +1,68 @@
-/* === Card Sizes === */
+/* === Card Sizes (aspect ratio 248:327 ≈ 0.758) === */
 .playing-card {
   position: relative;
   border-radius: 10px;
   user-select: none;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, outline 0.2s ease;
   flex-shrink: 0;
-  overflow: hidden;
+  /* 3D flip container */
+  perspective: 600px;
 }
 
 .card-sm {
   width: 52px;
-  height: 76px;
+  height: 69px;
   font-size: 10px;
   border-radius: 7px;
 }
 .card-md {
   width: 72px;
-  height: 104px;
+  height: 95px;
   font-size: 13px;
 }
 .card-lg {
   width: 96px;
-  height: 136px;
+  height: 127px;
   font-size: 16px;
+}
+
+/* === 3D Flip Inner === */
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  border-radius: inherit;
+}
+
+.playing-card.face-up .card-flip-inner {
+  transform: rotateY(180deg);
+}
+
+/* Both faces */
+.card-face-img,
+.card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Front face (rotated 180deg so it shows when flipped) */
+.card-face-img {
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* === Face Up === */
 .playing-card.face-up {
-  background: linear-gradient(145deg, #ffffff 0%, #f8f8f0 100%);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+    0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 /* Subtle shine on face-up cards */
@@ -53,7 +83,7 @@
   );
   transform: rotate(-45deg) translateY(-100%);
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
   transition: transform 0.6s ease;
 }
 .playing-card.face-up:hover::before {
@@ -65,12 +95,31 @@
 
 /* === Face Down === */
 .playing-card.face-down {
-  background: linear-gradient(135deg, #1a3a6e 0%, #1e4d8e 40%, #1a3a6e 100%);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+    0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* === Card Image === */
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+
+/* === Card Back (image) === */
+.card-back {
+  background: #1a3060;
+}
+
+.back-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
 }
 
 /* === States === */
@@ -116,86 +165,6 @@
   50% { outline-color: rgba(255, 167, 38, 1); }
 }
 
-/* === Card Face Layout (Image) === */
-.card-face-img {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-  display: block;
-}
-
-/* === Card Back === */
-.card-back {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  padding: 4px;
-}
-
-.back-pattern {
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 4px,
-      rgba(255, 255, 255, 0.03) 4px,
-      rgba(255, 255, 255, 0.03) 8px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 4px,
-      rgba(255, 255, 255, 0.03) 4px,
-      rgba(255, 255, 255, 0.03) 8px
-    );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.back-inner {
-  width: 55%;
-  height: 45%;
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.back-symbol {
-  font-size: 1em;
-  opacity: 0.4;
-  letter-spacing: 2px;
-  line-height: 1;
-}
-.card-sm .back-symbol {
-  font-size: 0.7em;
-  letter-spacing: 1px;
-}
-.card-lg .back-symbol {
-  font-size: 1.3em;
-  letter-spacing: 3px;
-}
-
 /* === Known Card Memo (peeked card indicator on card back) === */
 .card-memo {
   position: absolute;
@@ -211,6 +180,7 @@
   pointer-events: none;
   backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 3;
 }
 .card-memo.memo-red {
   color: #ff6b6b;
@@ -226,4 +196,18 @@
   padding: 2px 6px;
   bottom: 6px;
   right: 6px;
+}
+
+/* === Responsive === */
+@media (max-width: 400px) {
+  .card-lg {
+    width: 80px;
+    height: 106px;
+    font-size: 14px;
+  }
+  .card-md {
+    width: 60px;
+    height: 79px;
+    font-size: 11px;
+  }
 }

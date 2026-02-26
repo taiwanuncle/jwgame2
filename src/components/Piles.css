@@ -12,8 +12,8 @@
 .stack-card {
   position: absolute;
   width: 96px;
-  height: 136px;
-  border-radius: 8px;
+  height: 127px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #1a237e 100%);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -44,7 +44,7 @@
 
 .empty-pile {
   width: 96px;
-  height: 136px;
+  height: 127px;
   border-radius: 8px;
   border: 2px dashed rgba(255, 255, 255, 0.15);
   display: flex;
@@ -57,4 +57,15 @@
   font-size: var(--font-size-sm);
   color: var(--text-muted);
   opacity: 0.5;
+}
+
+@media (max-width: 400px) {
+  .stack-card {
+    width: 80px;
+    height: 106px;
+  }
+  .empty-pile {
+    width: 80px;
+    height: 106px;
+  }
 }

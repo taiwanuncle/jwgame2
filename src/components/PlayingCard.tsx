@@ -57,32 +57,36 @@ export default function PlayingCard({
     className,
   ].filter(Boolean).join(' ');
 
+  // Both faces are always rendered for 3D flip
   const cardContent = (
-    <>
-      {faceUp && suit && rank ? (
-        <div className="card-face card-face-img">
+    <div className="card-flip-inner">
+      {/* Front face (card image) — shown when face-up via rotateY(180deg) */}
+      <div className="card-face-img">
+        {suit && rank && (
           <img
             src={getCardImageUrl(suit, rank)}
             alt={`${rank}${SUIT_SYMBOLS[suit]}`}
             className="card-image"
             draggable={false}
           />
-        </div>
-      ) : (
-        <div className="card-back">
-          <div className="back-pattern">
-            <div className="back-inner">
-              <span className="back-symbol">♠♥♦♣</span>
-            </div>
+        )}
+      </div>
+
+      {/* Back face — shown by default */}
+      <div className="card-back">
+        <img
+          src="/cards/back.png"
+          alt="card back"
+          className="back-image"
+          draggable={false}
+        />
+        {knownCard && (
+          <div className={`card-memo ${knownCard.suit === 'heart' || knownCard.suit === 'diamond' ? 'memo-red' : ''}`}>
+            {knownCard.rank}{SUIT_SYMBOLS[knownCard.suit]}
           </div>
-          {knownCard && (
-            <div className={`card-memo ${knownCard.suit === 'heart' || knownCard.suit === 'diamond' ? 'memo-red' : ''}`}>
-              {knownCard.rank}{SUIT_SYMBOLS[knownCard.suit]}
-            </div>
-          )}
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 
   if (dealDelay !== undefined) {

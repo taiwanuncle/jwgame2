@@ -49,7 +49,7 @@ export default function CardGrid({
         onClick={isSelectable && onCardClick ? () => onCardClick(pc.position) : undefined}
         disabled={!isSelectable}
         className={isSelectable ? 'selectable' : ''}
-        dealDelay={dealing ? pc.position * 0.1 : undefined}
+        dealDelay={dealing ? pc.position * 0.12 + 0.1 : undefined}
         knownCard={known}
       />
     );
