@@ -235,6 +235,8 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
           value={nickname}
           onChange={(e) => setNickname(e.target.value.slice(0, 12))}
           maxLength={12}
+          lang="ko"
+          autoComplete="off"
         />
       </div>
     </>
