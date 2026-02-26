@@ -94,11 +94,9 @@
 
 .back-image {
   position: absolute;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
+  inset: -1px;
   width: calc(100% + 2px);
-  height: 108%;
+  height: calc(100% + 2px);
   object-fit: cover;
   border-radius: inherit;
   display: block;
