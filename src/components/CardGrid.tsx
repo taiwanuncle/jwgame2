@@ -39,19 +39,20 @@ export default function CardGrid({
     const known = !pc.faceUp ? knownCards?.get(pc.position) : undefined;
 
     return (
-      <PlayingCard
-        key={pc.position}
-        suit={pc.card?.suit}
-        rank={pc.card?.rank}
-        faceUp={pc.faceUp}
-        size={size}
-        highlighted={isHighlighted}
-        onClick={isSelectable && onCardClick ? () => onCardClick(pc.position) : undefined}
-        disabled={!isSelectable}
-        className={isSelectable ? 'selectable' : ''}
-        dealDelay={dealing ? pc.position * 0.12 + 0.1 : undefined}
-        knownCard={known}
-      />
+      <div key={pc.position} data-card-position={pc.position}>
+        <PlayingCard
+          suit={pc.card?.suit}
+          rank={pc.card?.rank}
+          faceUp={pc.faceUp}
+          size={size}
+          highlighted={isHighlighted}
+          onClick={isSelectable && onCardClick ? () => onCardClick(pc.position) : undefined}
+          disabled={!isSelectable}
+          className={isSelectable ? 'selectable' : ''}
+          dealDelay={dealing ? pc.position * 0.12 + 0.1 : undefined}
+          knownCard={known}
+        />
+      </div>
     );
   };
 

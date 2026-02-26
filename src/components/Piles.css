@@ -25,10 +25,12 @@
 .stack-card.stack-2 {
   top: -2px;
   left: 2px;
+  transform: rotate(1.5deg);
 }
 .stack-card.stack-3 {
   top: -4px;
   left: 4px;
+  transform: rotate(-1deg);
 }
 
 .pile-count {

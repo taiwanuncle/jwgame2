@@ -138,6 +138,32 @@ export function playGameOver() {
   playTone(784, 0.4, "triangle", 0.06, 0.36); // harmony
 }
 
+/** Pair match — satisfying sparkle */
+export function playPairMatch() {
+  playTone(880, 0.1, "sine", 0.12);          // A5
+  playTone(1175, 0.1, "sine", 0.12, 0.06);   // D6
+  playTone(1397, 0.2, "sine", 0.10, 0.12);   // F#6
+  playTone(1760, 0.3, "sine", 0.08, 0.18);   // A6 (octave resolution)
+}
+
+/** Straight bonus — dramatic flourish */
+export function playStraight() {
+  playTone(523, 0.1, "triangle", 0.12);       // C5
+  playTone(587, 0.1, "triangle", 0.12, 0.07); // D5
+  playTone(659, 0.1, "triangle", 0.12, 0.14); // E5
+  playTone(698, 0.1, "triangle", 0.12, 0.21); // F5
+  playTone(784, 0.12, "sine", 0.14, 0.28);    // G5 (sustain)
+  playTone(1047, 0.35, "sine", 0.10, 0.35);   // C6 (resolve)
+}
+
+/** Multiplier round alert — impactful boom */
+export function playMultiplierAlert() {
+  playTone(220, 0.2, "sine", 0.15);           // A3 (bass)
+  playTone(440, 0.15, "triangle", 0.12, 0.05);// A4
+  playTone(880, 0.25, "sine", 0.10, 0.15);    // A5 (octave rise)
+  playNoise(0.08, 0.1, 0.1);                  // impact
+}
+
 /** Button click — subtle tick */
 export function playClick() {
   playTone(1000, 0.04, "square", 0.05);

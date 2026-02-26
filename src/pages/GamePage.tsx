@@ -17,6 +17,7 @@ import type { ChatMessage } from '../types';
 import {
   playCardFlip, playCardDeal, playMyTurn, playThankYou,
   playSwap, playDiscard, playRoundEnd, playTimerWarning,
+  playPairMatch, playStraight, playMultiplierAlert,
 } from '../utils/sfx';
 import './GamePage.css';
 
@@ -101,6 +102,11 @@ export default function GamePage({
   const [showAdvancedPopup, setShowAdvancedPopup] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showCardLog, setShowCardLog] = useState(false);
+  const [swapAnim, setSwapAnim] = useState<{
+    suit: string; rank: string;
+    sx: number; sy: number; ex: number; ey: number;
+    w: number; h: number;
+  } | null>(null);
   const advancedPopupShownRef = useRef(false);
   const prevLogLenRef = useRef(gameState.actionLog.length);
   const prevPhaseRef = useRef<string | null>(null);
@@ -138,8 +144,10 @@ export default function GamePage({
         const curR = gameState.currentRound;
         if (curR === totalR) {
           setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '🔥 마지막 라운드! 점수 x3!!', type: 'alert' }]);
+          playMultiplierAlert();
         } else if (curR === totalR - 1) {
           setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '⚡ 이번 라운드 점수 x2!', type: 'alert' }]);
+          playMultiplierAlert();
         }
       }
       const timer = setTimeout(() => setDealing(false), 800);
@@ -160,10 +168,10 @@ export default function GamePage({
     const hasStraight = roundResult.playerScores.some((ps) => ps.straightBonus);
     if (!hasPairs && !hasStraight) return;
 
-    // Delayed confetti burst for bonus scoring
+    // Delayed confetti burst + SFX for bonus scoring
     const timer = setTimeout(() => {
       if (hasStraight) {
-        // Big burst for straight
+        playStraight();
         confetti({
           particleCount: 60,
           spread: 100,
@@ -173,7 +181,7 @@ export default function GamePage({
         });
       }
       if (hasPairs) {
-        // Side sparkles for pairs
+        if (!hasStraight) playPairMatch();
         confetti({
           particleCount: 30,
           angle: 60,
@@ -243,6 +251,13 @@ export default function GamePage({
     return () => clearInterval(interval);
   }, [gameState.timerEnd]);
 
+  // Auto-clear swap animation
+  useEffect(() => {
+    if (!swapAnim) return;
+    const timer = setTimeout(() => setSwapAnim(null), 450);
+    return () => clearTimeout(timer);
+  }, [swapAnim]);
+
   const removeToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
@@ -271,15 +286,32 @@ export default function GamePage({
     if (myTurnPhase === 'select_own_card' || myTurnPhase === 'drawn_card_action') {
       const card = myCards.find((c) => c.position === position);
 
+      const doSwap = () => {
+        playSwap();
+        // Trigger flying card animation
+        const drawnEl = document.querySelector('.drawn-card-display .playing-card');
+        const targetEl = document.querySelector(`[data-card-position="${position}"] .playing-card`);
+        if (drawnEl && targetEl && drawnCard) {
+          const dr = drawnEl.getBoundingClientRect();
+          const tr = targetEl.getBoundingClientRect();
+          setSwapAnim({
+            suit: drawnCard.suit, rank: drawnCard.rank,
+            sx: dr.left, sy: dr.top,
+            ex: tr.left, ey: tr.top,
+            w: dr.width, h: dr.height,
+          });
+        }
+        onSwapCard(position);
+        setActionMode(null);
+      };
+
       if (actionMode === 'swap') {
         // From pile: prefer face-down, but allow face-up as fallback
         if (card && card.faceUp) {
           const hasFaceDown = myCards.some((c) => !c.faceUp);
           if (hasFaceDown) return; // Block if face-down cards available
         }
-        playSwap();
-        onSwapCard(position);
-        setActionMode(null);
+        doSwap();
       } else if (actionMode === 'discard') {
         if (card && !card.faceUp) {
           playDiscard();
@@ -288,12 +320,10 @@ export default function GamePage({
         }
       } else if (myTurnPhase === 'select_own_card') {
         // From discard pile (must swap) — allow any card
-        playSwap();
-        onSwapCard(position);
-        setActionMode(null);
+        doSwap();
       }
     }
-  }, [myTurnPhase, actionMode, myCards, onSwapCard, onDiscardAndFlip]);
+  }, [myTurnPhase, actionMode, myCards, onSwapCard, onDiscardAndFlip, drawnCard]);
 
   // Selectable positions for my cards
   const getSelectablePositions = (): number[] => {
@@ -431,9 +461,9 @@ export default function GamePage({
                   </div>
                   <motion.span
                     className="score-final"
-                    initial={{ scale: 0.5, opacity: 0 }}
+                    initial={{ scale: 1.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: i * 0.12 + 0.3, duration: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+                    transition={{ delay: i * 0.12 + 0.3, duration: 0.5, type: 'spring', stiffness: 200, damping: 15 }}
                   >
                     {ps.finalScore}점
                   </motion.span>
@@ -735,6 +765,49 @@ export default function GamePage({
           />
         )}
       </div>
+
+      {/* Swap Card Flying Animation */}
+      <AnimatePresence>
+        {swapAnim && (
+          <motion.div
+            key="swap-flying"
+            style={{
+              position: 'fixed',
+              left: swapAnim.sx,
+              top: swapAnim.sy,
+              width: swapAnim.w,
+              height: swapAnim.h,
+              zIndex: 1000,
+              pointerEvents: 'none',
+            }}
+            initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+            animate={{
+              x: swapAnim.ex - swapAnim.sx,
+              y: swapAnim.ey - swapAnim.sy,
+              scale: [1, 1.15, 1],
+              transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.8,
+              transition: { duration: 0.15 },
+            }}
+          >
+            <img
+              src={`/cards/${swapAnim.suit}_${swapAnim.rank}.png`}
+              alt=""
+              draggable={false}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '10px',
+                boxShadow: '0 8px 32px rgba(76, 175, 80, 0.5), 0 0 16px rgba(76, 175, 80, 0.3)',
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
