@@ -64,9 +64,12 @@ export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props
         ) : (
           <div className="log-list">
             {cardEvents.map((ev, i) => (
-              <div key={i} className="log-entry">
+              <div key={i} className={`log-entry${i === 0 ? ' log-first' : ''}${i === cardEvents.length - 1 ? ' log-last' : ''}`}>
+                <span className="log-num">{i + 1}</span>
                 <span className={`log-card ${ev.isRed ? 'log-red' : 'log-black'}`}>{ev.card}</span>
                 <span className="log-detail">{ev.player} — {ev.action}</span>
+                {i === 0 && <span className="log-tag log-tag-first">처음</span>}
+                {i === cardEvents.length - 1 && <span className="log-tag log-tag-last">최근</span>}
               </div>
             ))}
           </div>

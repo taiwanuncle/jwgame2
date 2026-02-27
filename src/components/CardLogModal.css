@@ -58,4 +58,33 @@
 .log-detail {
   color: var(--text-muted);
   font-size: var(--font-size-xs);
+  flex: 1;
+}
+
+.log-num {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  min-width: 18px;
+  text-align: center;
+  opacity: 0.5;
+}
+
+.log-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.log-tag-first {
+  background: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+}
+.log-tag-last {
+  background: rgba(255, 167, 38, 0.2);
+  color: #ffa726;
+}
+.log-entry.log-last {
+  background: rgba(255, 167, 38, 0.08);
 }

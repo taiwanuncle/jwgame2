@@ -75,8 +75,8 @@ export function useSocket() {
 
     socket.on('game_state', (state: GameStateFromServer) => {
       if (leavingRef.current) return;
-      // Ignore stale game_state from a room we already left
-      if (currentRoomRef.current && state.roomCode !== currentRoomRef.current) return;
+      // Ignore game_state if we're not tracking any room or from a different room
+      if (!currentRoomRef.current || state.roomCode !== currentRoomRef.current) return;
       setGameState(state);
 
       if (state.phase === 'game_over') {

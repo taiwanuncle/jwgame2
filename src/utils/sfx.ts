@@ -7,7 +7,8 @@
 let audioCtx: AudioContext | null = null;
 
 function getCtx(): AudioContext {
-  if (!audioCtx) {
+  // Recreate if closed or missing
+  if (!audioCtx || audioCtx.state === "closed") {
     audioCtx = new AudioContext();
   }
   // Resume if suspended (autoplay policy)
@@ -16,6 +17,15 @@ function getCtx(): AudioContext {
   }
   return audioCtx;
 }
+
+// Keep AudioContext alive on user interaction
+function resumeOnInteraction() {
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+  }
+}
+window.addEventListener("click", resumeOnInteraction);
+window.addEventListener("touchstart", resumeOnInteraction);
 
 function isSfxEnabled(): boolean {
   try {

@@ -21,7 +21,23 @@ const rooms = new Map();
 const MAX_PLAYERS = 10;
 const TURN_TIMER_SECONDS = 30;
 
-const BOT_NAMES = ["봇1", "봇2", "봇3", "봇4", "봇5", "봇6", "봇7", "봇8", "봇9"];
+// Bot personalities: name + preferred avatar + play style hint
+const BOT_POOL = [
+  { name: "럭키", avatar: 5 },      // 🦊 Lucky — risk-taker
+  { name: "신중이", avatar: 6 },    // 🐻 Cautious
+  { name: "대담이", avatar: 9 },    // 🦁 Bold
+  { name: "느긋이", avatar: 8 },    // 🐨 Relaxed
+  { name: "똑똑이", avatar: 7 },    // 🐼 Smart
+  { name: "불꽃이", avatar: 10 },   // 🐯 Fiery
+  { name: "꾀돌이", avatar: 4 },    // 🐰 Cunning
+  { name: "바람이", avatar: 3 },    // 🐹 Breezy
+  { name: "말랑이", avatar: 2 },    // 🐭 Soft
+];
+
+function pickBots(count, excludeAvatar) {
+  const shuffled = [...BOT_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.filter((b) => b.avatar !== excludeAvatar).slice(0, count);
+}
 
 app.get("/api/status", (req, res) => {
   res.json({ status: "ok", rooms: rooms.size });
@@ -1025,11 +1041,13 @@ io.on("connection", (socket) => {
     // Add bots if requested (single player or multiplayer with bots)
     const botCount = room.roomOptions.botCount || 0;
     if (botCount > 0) {
+      const bots = pickBots(botCount, avatarIndex);
       for (let i = 0; i < botCount; i++) {
+        const bot = bots[i] || { name: `봇${i + 1}`, avatar: (avatarIndex + i + 1) % 12 };
         room.players.push({
           id: `bot_${uuidv4()}`,
-          nickname: BOT_NAMES[i],
-          avatarIndex: (avatarIndex + i + 1) % 12,
+          nickname: bot.name,
+          avatarIndex: bot.avatar,
           ready: true,
           isHost: false,
           isBot: true,

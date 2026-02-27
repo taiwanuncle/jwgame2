@@ -90,6 +90,40 @@
   padding: 6px 12px;
 }
 
+/* === KakaoTalk banner === */
+.kakao-banner {
+  text-align: center;
+  padding: 28px 24px 20px;
+}
+.kakao-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+.kakao-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+.kakao-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  word-break: keep-all;
+}
+.kakao-desc strong {
+  color: var(--accent);
+}
+.kakao-open-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  margin-bottom: 14px;
+}
+
 @media (max-width: 400px) {
   .install-prompt-banner {
     padding: 16px;

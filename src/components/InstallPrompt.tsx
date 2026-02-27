@@ -3,76 +3,138 @@ import { motion, AnimatePresence } from 'framer-motion';
 import './InstallPrompt.css';
 
 const DISMISS_KEY = 'pwa_install_dismissed';
-const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+const KAKAO_DISMISS_KEY = 'kakao_warn_hide';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+function isHiddenToday(key: string): boolean {
+  try {
+    const hideUntil = localStorage.getItem(key);
+    if (hideUntil) return new Date() < new Date(hideUntil);
+  } catch { /* ignore */ }
+  return false;
+}
+
+function hideUntilEndOfDay(key: string) {
+  try {
+    const eod = new Date();
+    eod.setHours(23, 59, 59, 999);
+    localStorage.setItem(key, eod.toISOString());
+  } catch { /* ignore */ }
+}
+
 export default function InstallPrompt() {
-  const [show, setShow] = useState(false);
+  // === KakaoTalk browser warning ===
+  const [showKakao, setShowKakao] = useState(false);
+  const [kakaoHideToday, setKakaoHideToday] = useState(false);
+
+  // === PWA install prompt ===
+  const [showInstall, setShowInstall] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [installHideToday, setInstallHideToday] = useState(false);
 
   useEffect(() => {
-    // Already running as installed PWA
+    const ua = navigator.userAgent.toLowerCase();
+
+    // 1. KakaoTalk in-app browser detection (highest priority)
+    const isKakao = ua.includes('kakaotalk') || ua.includes('kakao');
+    if (isKakao) {
+      if (!isHiddenToday(KAKAO_DISMISS_KEY)) {
+        setShowKakao(true);
+      }
+      return; // Don't show install prompt in KakaoTalk
+    }
+
+    // 2. PWA install prompt
     if (window.matchMedia('(display-mode: standalone)').matches) return;
     if ((navigator as unknown as { standalone?: boolean }).standalone === true) return;
+    if (isHiddenToday(DISMISS_KEY)) return;
 
-    // Check if dismissed
-    try {
-      const dismissedAt = localStorage.getItem(DISMISS_KEY);
-      if (dismissedAt) {
-        const elapsed = Date.now() - parseInt(dismissedAt, 10);
-        if (elapsed < DISMISS_DURATION) return;
-      }
-    } catch { /* ignore */ }
-
-    const ua = navigator.userAgent;
     const isiOS = /iphone|ipad|ipod/i.test(ua);
-
     if (isiOS) {
       setIsIOS(true);
-      const timer = setTimeout(() => setShow(true), 3000);
+      const timer = setTimeout(() => setShowInstall(true), 3000);
       return () => clearTimeout(timer);
     } else {
       const handler = (e: Event) => {
         e.preventDefault();
         setDeferredPrompt(e as BeforeInstallPromptEvent);
-        setTimeout(() => setShow(true), 2000);
+        setTimeout(() => setShowInstall(true), 2000);
       };
       window.addEventListener('beforeinstallprompt', handler);
       return () => window.removeEventListener('beforeinstallprompt', handler);
     }
   }, []);
 
+  // KakaoTalk handlers
+  const handleKakaoOpen = useCallback(() => {
+    const url = window.location.href;
+    window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+  }, []);
+
+  const handleKakaoClose = useCallback(() => {
+    if (kakaoHideToday) hideUntilEndOfDay(KAKAO_DISMISS_KEY);
+    setShowKakao(false);
+  }, [kakaoHideToday]);
+
+  // PWA install handlers
   const handleInstall = useCallback(async () => {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
       const result = await deferredPrompt.userChoice;
-      if (result.outcome === 'accepted') {
-        setShow(false);
-      }
+      if (result.outcome === 'accepted') setShowInstall(false);
       setDeferredPrompt(null);
     }
   }, [deferredPrompt]);
 
-  const handleDismiss = useCallback(() => {
-    if (dontShowAgain) {
-      try {
-        localStorage.setItem(DISMISS_KEY, Date.now().toString());
-      } catch { /* ignore */ }
-    }
-    setShow(false);
-  }, [dontShowAgain]);
-
-  if (!show) return null;
+  const handleInstallDismiss = useCallback(() => {
+    if (installHideToday) hideUntilEndOfDay(DISMISS_KEY);
+    setShowInstall(false);
+  }, [installHideToday]);
 
   return (
     <AnimatePresence>
-      {show && (
+      {/* KakaoTalk warning popup */}
+      {showKakao && (
+        <motion.div
+          className="install-prompt-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="install-prompt-banner kakao-banner"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          >
+            <div className="kakao-icon">⚠️</div>
+            <h3 className="kakao-title">카카오톡 브라우저 안내</h3>
+            <p className="kakao-desc">
+              카카오톡 브라우저에서 접속하셨습니다.<br />
+              카톡 알림이 오면 게임이 튕길 수 있어요!<br />
+              <strong>다른 브라우저</strong>로 열면 안정적으로 즐길 수 있습니다.
+            </p>
+            <button className="btn btn-primary kakao-open-btn" onClick={handleKakaoOpen}>
+              🌐 외부 브라우저로 열기
+            </button>
+            <div className="install-prompt-bottom">
+              <label className="install-prompt-checkbox">
+                <input type="checkbox" checked={kakaoHideToday} onChange={(e) => setKakaoHideToday(e.target.checked)} />
+                <span>오늘 하루 보지 않기</span>
+              </label>
+              <button className="btn btn-ghost install-prompt-close" onClick={handleKakaoClose}>닫기</button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* PWA install prompt */}
+      {showInstall && (
         <motion.div
           className="install-prompt-overlay"
           initial={{ opacity: 0 }}
@@ -101,7 +163,6 @@ export default function InstallPrompt() {
                 )}
               </div>
             </div>
-
             <div className="install-prompt-actions">
               {!isIOS && deferredPrompt && (
                 <button className="btn btn-primary install-prompt-install-btn" onClick={handleInstall}>
@@ -110,16 +171,10 @@ export default function InstallPrompt() {
               )}
               <div className="install-prompt-bottom">
                 <label className="install-prompt-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={dontShowAgain}
-                    onChange={(e) => setDontShowAgain(e.target.checked)}
-                  />
-                  <span>다시 보지 않기</span>
+                  <input type="checkbox" checked={installHideToday} onChange={(e) => setInstallHideToday(e.target.checked)} />
+                  <span>오늘 하루 보지 않기</span>
                 </label>
-                <button className="btn btn-ghost install-prompt-close" onClick={handleDismiss}>
-                  닫기
-                </button>
+                <button className="btn btn-ghost install-prompt-close" onClick={handleInstallDismiss}>닫기</button>
               </div>
             </div>
           </motion.div>
