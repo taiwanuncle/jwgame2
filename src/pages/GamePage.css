@@ -390,6 +390,13 @@
 .pair-badge.straight {
   font-size: 10px;
 }
+.scoring-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-sm);
+  width: 100%;
+}
 
 /* === Advanced Mode Popup === */
 .advanced-popup-overlay {

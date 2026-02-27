@@ -4,6 +4,7 @@ import type { AvailableRoom, RoomOptions, GameMode, CardCount, BotDifficulty } f
 import InfoModal from '../components/InfoModal';
 import PlaylistModal from '../components/PlaylistModal';
 import MusicToggle from '../components/MusicToggle';
+import InstallPrompt from '../components/InstallPrompt';
 import './LobbyPage.css';
 
 interface Props {
@@ -264,6 +265,7 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
 
   return (
     <div className="page lobby-page">
+      <InstallPrompt />
       <div className="floating-music-toggle">
         <MusicToggle />
       </div>

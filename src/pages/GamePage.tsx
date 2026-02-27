@@ -539,20 +539,24 @@ export default function GamePage({
               });
             })()}
           </div>
-          {isHost && (
-            <motion.button
-              className="btn btn-primary btn-large"
-              onClick={onNextRound}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {gameState.currentRound >= gameState.roomOptions.totalRounds ? '최종 결과 보기' : '다음 라운드'}
-            </motion.button>
-          )}
+          <div className="scoring-actions">
+            {isHost && (
+              <motion.button
+                className="btn btn-primary btn-large"
+                onClick={onNextRound}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {gameState.currentRound >= gameState.roomOptions.totalRounds ? '최종 결과 보기' : '다음 라운드'}
+              </motion.button>
+            )}
+            <button className="btn btn-ghost" onClick={() => setShowCardLog(true)}>카드 로그 📋</button>
+          </div>
         </div>
+        <CardLogModal isOpen={showCardLog} onClose={() => setShowCardLog(false)} actionLog={gameState.actionLog} myId={gameState.myId} />
         <GlobalChat messages={chatMessages} onSend={onSendChat} myId={gameState.myId} />
       </div>
     );

@@ -1,0 +1,106 @@
+.install-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.install-prompt-banner {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+}
+
+.install-prompt-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.install-prompt-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.install-prompt-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.install-prompt-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.install-prompt-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+.install-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.install-prompt-install-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.install-prompt-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.install-prompt-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.install-prompt-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+}
+
+.install-prompt-close {
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+@media (max-width: 400px) {
+  .install-prompt-banner {
+    padding: 16px;
+  }
+  .install-prompt-icon {
+    font-size: 26px;
+  }
+  .install-prompt-title {
+    font-size: 14px;
+  }
+  .install-prompt-desc {
+    font-size: 12px;
+  }
+}

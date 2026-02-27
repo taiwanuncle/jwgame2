@@ -247,6 +247,12 @@ class AudioManager {
       this.audio.volume = this._muted ? 0 : this._volume;
     }
     try { localStorage.setItem("bgm_muted", String(this._muted)); } catch { /* */ }
+    // After unmuting, start playback if nothing is playing
+    if (!this._muted && !this._playing && this._pendingCategory && this._userInteracted) {
+      this._userPaused = false;
+      this._currentCategory = null;
+      this.playCategory(this._pendingCategory);
+    }
     this.notify();
   }
 }
