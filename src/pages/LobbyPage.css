@@ -62,6 +62,38 @@
   font-weight: 600;
 }
 
+/* Random nickname button */
+.avatar-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-xs);
+}
+.avatar-picker-header label {
+  margin-bottom: 0;
+}
+.btn-random {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-random:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.25);
+}
+.btn-random:active {
+  transform: scale(0.9);
+}
+
 .avatar-grid {
   display: flex;
   flex-wrap: wrap;

@@ -5,6 +5,7 @@ import InfoModal from '../components/InfoModal';
 import PlaylistModal from '../components/PlaylistModal';
 import MusicToggle from '../components/MusicToggle';
 import InstallPrompt from '../components/InstallPrompt';
+import { generateRandomName } from '../utils/randomName';
 import './LobbyPage.css';
 
 interface Props {
@@ -73,6 +74,12 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   const handleJoin = (roomCode: string) => {
     if (!nickname.trim()) return;
     onJoinRoom(roomCode, nickname.trim(), avatarIndex);
+  };
+
+  const handleRandom = () => {
+    const result = generateRandomName();
+    setAvatarIndex(result.avatarIndex);
+    setNickname(result.nickname);
   };
 
   if (mode === 'menu') {
@@ -213,7 +220,17 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   const avatarNicknameSection = (
     <>
       <div className="avatar-picker">
-        <label>아바타 선택</label>
+        <div className="avatar-picker-header">
+          <label>아바타 선택</label>
+          <motion.button
+            className="btn-random"
+            onClick={handleRandom}
+            whileTap={{ scale: 0.9, rotate: 180 }}
+            title="랜덤 닉네임"
+          >
+            🎲
+          </motion.button>
+        </div>
         <div className="avatar-grid">
           {AVATARS.map((emoji, i) => (
             <motion.button
