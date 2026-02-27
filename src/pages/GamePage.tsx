@@ -483,12 +483,15 @@ export default function GamePage({
                 // Build pair info map: array index → { color, isZero }
                 const PAIR_COLORS = ['#4caf50', '#ff9800', '#e91e63'];
                 const ZERO_PAIR_COLOR = '#fdd835';
+                const STRAIGHT_COLOR = '#4fc3f7';
                 const pairInfoMap = new Map<number, { color: string; isZero: boolean }>();
                 ps.pairBonuses.forEach((pb, pbi) => {
                   const isZero = pb.saved === 0;
                   const color = isZero ? ZERO_PAIR_COLOR : PAIR_COLORS[pbi % PAIR_COLORS.length];
                   pb.positions.forEach(pos => pairInfoMap.set(pos, { color, isZero }));
                 });
+                // Build straight position set
+                const straightPositions = new Set<number>(ps.straightBonus?.positions ?? []);
 
                 return (
                   <div key={ps.playerId} className="reveal-player">
@@ -496,11 +499,12 @@ export default function GamePage({
                     <div className="reveal-cards">
                       {ps.cards.map((c, ci) => {
                         const pairInfo = pairInfoMap.get(ci);
-                        const isSoloZero = !pairInfo && (c.card.rank === 'K' || c.card.rank === '10');
+                        const isStraight = straightPositions.has(ci);
+                        const isSoloZero = !pairInfo && !isStraight && (c.card.rank === 'K' || c.card.rank === '10');
                         return (
                           <motion.div
                             key={c.position}
-                            className={`reveal-card-wrap${pairInfo ? ' is-pair' : ''}${pairInfo?.isZero ? ' zero-pair' : ''}${isSoloZero ? ' zero-solo' : ''}`}
+                            className={`reveal-card-wrap${pairInfo ? ' is-pair' : ''}${pairInfo?.isZero ? ' zero-pair' : ''}${isSoloZero ? ' zero-solo' : ''}${isStraight ? ' is-straight' : ''}`}
                             initial={{ opacity: 0, rotateY: 180, scale: 0.7 }}
                             animate={{ opacity: 1, rotateY: 0, scale: 1 }}
                             transition={{
@@ -515,12 +519,15 @@ export default function GamePage({
                               faceUp={true}
                               size={revealSize}
                             />
-                            {pairInfo && (
+                            {isStraight && (
+                              <span className="pair-badge straight" style={{ background: STRAIGHT_COLOR }}>스트레이트!</span>
+                            )}
+                            {!isStraight && pairInfo && (
                               <span className={`pair-badge${pairInfo.isZero ? ' zero' : ''}`} style={{ background: pairInfo.color }}>
                                 {pairInfo.isZero ? '0점!' : '페어!'}
                               </span>
                             )}
-                            {isSoloZero && (
+                            {!isStraight && isSoloZero && (
                               <span className="pair-badge zero" style={{ background: '#fdd835' }}>0점!</span>
                             )}
                           </motion.div>

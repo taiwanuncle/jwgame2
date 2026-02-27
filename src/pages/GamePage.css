@@ -378,6 +378,18 @@
   font-size: 11px;
   color: #1a1a2e;
 }
+/* Straight — sky blue */
+.reveal-card-wrap.is-straight .playing-card {
+  box-shadow: 0 0 0 3px #4fc3f7, 0 0 12px rgba(79, 195, 247, 0.5);
+  animation: straight-glow 1.5s ease infinite;
+}
+@keyframes straight-glow {
+  0%, 100% { box-shadow: 0 0 0 3px #4fc3f7, 0 0 12px rgba(79, 195, 247, 0.5); }
+  50% { box-shadow: 0 0 0 3px #4fc3f7, 0 0 20px rgba(79, 195, 247, 0.7); }
+}
+.pair-badge.straight {
+  font-size: 10px;
+}
 
 /* === Advanced Mode Popup === */
 .advanced-popup-overlay {
