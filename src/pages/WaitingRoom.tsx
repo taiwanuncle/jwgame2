@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import type { GameStateFromServer, RoomOptions, GameMode, CardCount } from '../types';
 import MusicToggle from '../components/MusicToggle';
 import './WaitingRoom.css';
@@ -23,6 +24,7 @@ export default function WaitingRoom({
   onLeave,
   errorMsg,
 }: Props) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const me = gameState.players.find((p) => p.id === gameState.myId);
@@ -48,57 +50,57 @@ export default function WaitingRoom({
         <MusicToggle />
       </div>
       <div className="waiting-header">
-        <button className="btn btn-ghost" onClick={onLeave}>← 나가기</button>
-        <h2>대기실</h2>
+        <button className="btn btn-ghost" onClick={onLeave}>{t('waiting.leave')}</button>
+        <h2>{t('waiting.title')}</h2>
         <div className="room-code-box" onClick={copyCode}>
           <span className="room-code">{gameState.roomCode}</span>
-          <span className="copy-hint">{copied ? '복사됨!' : '클릭하여 복사'}</span>
+          <span className="copy-hint">{copied ? t('waiting.copied') : t('waiting.clickToCopy')}</span>
         </div>
       </div>
 
       {/* Room Options (host only) */}
       {isHost && (
         <div className="room-options surface">
-          <h3>게임 설정</h3>
+          <h3>{t('waiting.gameSettings')}</h3>
           <div className="options-grid">
             <div className="option-group">
-              <label>게임 모드</label>
+              <label>{t('waiting.gameMode')}</label>
               <div className="toggle-group">
                 <button
                   className={`toggle-btn ${gameState.roomOptions.gameMode === 'normal' ? 'active' : ''}`}
                   onClick={() => onSetRoomOptions({ gameMode: 'normal' as GameMode })}
                 >
-                  일반
+                  {t('waiting.normal')}
                 </button>
                 <button
                   className={`toggle-btn ${gameState.roomOptions.gameMode === 'advanced' ? 'active' : ''}`}
                   onClick={() => onSetRoomOptions({ gameMode: 'advanced' as GameMode })}
                 >
-                  상급자
+                  {t('waiting.advanced')}
                 </button>
               </div>
             </div>
 
             <div className="option-group">
-              <label>카드 수</label>
+              <label>{t('waiting.cardCount')}</label>
               <div className="toggle-group">
                 <button
                   className={`toggle-btn ${gameState.roomOptions.cardCount === 4 ? 'active' : ''}`}
                   onClick={() => onSetRoomOptions({ cardCount: 4 as CardCount })}
                 >
-                  4장
+                  {t('waiting.cards4')}
                 </button>
                 <button
                   className={`toggle-btn ${gameState.roomOptions.cardCount === 6 ? 'active' : ''}`}
                   onClick={() => onSetRoomOptions({ cardCount: 6 as CardCount })}
                 >
-                  6장
+                  {t('waiting.cards6')}
                 </button>
               </div>
             </div>
 
             <div className="option-group">
-              <label>라운드 수</label>
+              <label>{t('waiting.roundCount')}</label>
               <div className="toggle-group">
                 {roundOptions.map((r) => (
                   <button
@@ -120,9 +122,9 @@ export default function WaitingRoom({
         <div className="room-options-display surface">
           <div className="option-badges">
             <span className="badge badge-accent">
-              {gameState.roomOptions.gameMode === 'advanced' ? '상급자' : '일반'}
+              {gameState.roomOptions.gameMode === 'advanced' ? t('waiting.advanced') : t('waiting.normal')}
             </span>
-            <span className="badge badge-warning">{gameState.roomOptions.cardCount}장</span>
+            <span className="badge badge-warning">{gameState.roomOptions.cardCount}{t('lobby.cardsSuffix')}</span>
             <span className="badge badge-accent">{gameState.roomOptions.totalRounds}R</span>
           </div>
         </div>
@@ -130,7 +132,7 @@ export default function WaitingRoom({
 
       {/* Player List */}
       <div className="player-list surface">
-        <h3>플레이어 ({playerCount}/10)</h3>
+        <h3>{t('waiting.players', { count: playerCount })}</h3>
         <div className="players">
           {gameState.players.map((p, i) => (
             <motion.div
@@ -143,10 +145,10 @@ export default function WaitingRoom({
               <span className="player-avatar">{AVATARS[p.avatarIndex] || '🎴'}</span>
               <span className="player-name">
                 {p.nickname}
-                {p.isHost && <span className="host-badge">방장</span>}
+                {p.isHost && <span className="host-badge">{t('waiting.host')}</span>}
               </span>
               <span className={`player-status ${p.isHost ? 'host' : p.ready ? 'ready' : ''}`}>
-                {p.isHost ? '👑' : p.ready ? '✓ 준비' : '대기중'}
+                {p.isHost ? '👑' : p.ready ? t('waiting.ready') : t('waiting.waitingStatus')}
               </span>
             </motion.div>
           ))}
@@ -162,17 +164,17 @@ export default function WaitingRoom({
             disabled={!canStart}
           >
             {gameState.players.length < 2
-              ? '2명 이상 필요'
+              ? t('waiting.needMin')
               : !allReady
-              ? '모두 준비 대기중...'
-              : '게임 시작!'}
+              ? t('waiting.waitAllReady')
+              : t('waiting.startGame')}
           </button>
         ) : (
           <button
             className={`btn btn-large ${me?.ready ? 'btn-danger' : 'btn-primary'}`}
             onClick={onToggleReady}
           >
-            {me?.ready ? '준비 취소' : '준비 완료'}
+            {me?.ready ? t('waiting.readyCancel') : t('waiting.readyComplete')}
           </button>
         )}
       </div>

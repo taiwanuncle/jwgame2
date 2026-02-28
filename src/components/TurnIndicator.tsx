@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import './TurnIndicator.css';
 
 interface Props {
@@ -8,7 +9,8 @@ interface Props {
 }
 
 export default function TurnIndicator({ playerName, isMyTurn, isLastTurn }: Props) {
-  const label = isMyTurn ? '내 차례!' : `${playerName}의 차례`;
+  const { t } = useTranslation();
+  const label = isMyTurn ? t('game.myTurn') : t('game.playerTurn', { name: playerName });
 
   return (
     <AnimatePresence mode="wait">

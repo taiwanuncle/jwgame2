@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { audioManager, ALL_TRACKS, type Track, type MusicCategory } from '../utils/audioManager';
 import './PlaylistModal.css';
 
@@ -8,12 +9,6 @@ interface Props {
   onClose: () => void;
 }
 
-const CATEGORY_LABELS: Record<MusicCategory, string> = {
-  opening: '오프닝',
-  playing: '플레이',
-  celebration: '축하',
-};
-
 const CATEGORY_ICONS: Record<MusicCategory, string> = {
   opening: '🎬',
   playing: '🎮',
@@ -21,6 +16,7 @@ const CATEGORY_ICONS: Record<MusicCategory, string> = {
 };
 
 export default function PlaylistModal({ isOpen, onClose }: Props) {
+  const { t } = useTranslation();
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -31,6 +27,12 @@ export default function PlaylistModal({ isOpen, onClose }: Props) {
   const isPlaying = audioManager.playing;
   const volume = audioManager.volume;
   const isMuted = audioManager.muted;
+
+  const categoryLabels: Record<MusicCategory, string> = {
+    opening: t('music.catOpening'),
+    playing: t('music.catPlaying'),
+    celebration: t('music.catCelebration'),
+  };
 
   const handleTrackClick = useCallback((track: Track) => {
     if (currentTrack?.id === track.id && isPlaying) {
@@ -85,7 +87,7 @@ export default function PlaylistModal({ isOpen, onClose }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="info-modal-header">
-              <h2>🎵 플레이리스트</h2>
+              <h2>{t('music.playlist')}</h2>
               <button className="info-modal-close" onClick={onClose}>✕</button>
             </div>
 
@@ -97,20 +99,20 @@ export default function PlaylistModal({ isOpen, onClose }: Props) {
                     {CATEGORY_ICONS[currentTrack.category]} {currentTrack.name}
                   </span>
                 ) : (
-                  <span className="now-playing-text now-playing-empty">선택된 곡 없음</span>
+                  <span className="now-playing-text now-playing-empty">{t('music.noTrack')}</span>
                 )}
               </div>
               <div className="player-controls">
-                <button className="player-btn" onClick={handleTogglePlay} title={isPlaying ? '일시정지' : '재생'}>
+                <button className="player-btn" onClick={handleTogglePlay} title={isPlaying ? t('music.pause') : t('music.play')}>
                   {isPlaying ? '⏸' : '▶️'}
                 </button>
-                <button className="player-btn" onClick={handleNext} title="다음곡">
+                <button className="player-btn" onClick={handleNext} title={t('music.next')}>
                   ⏭
                 </button>
-                <button className="player-btn" onClick={handleShuffle} title="랜덤">
+                <button className="player-btn" onClick={handleShuffle} title={t('music.shuffle')}>
                   🔀
                 </button>
-                <button className={`player-btn ${isMuted ? 'muted' : ''}`} onClick={handleToggleMute} title={isMuted ? '음소거 해제' : '음소거'}>
+                <button className={`player-btn ${isMuted ? 'muted' : ''}`} onClick={handleToggleMute} title={isMuted ? t('music.unmute') : t('music.mute')}>
                   {isMuted ? '🔇' : '🔊'}
                 </button>
               </div>
@@ -135,7 +137,7 @@ export default function PlaylistModal({ isOpen, onClose }: Props) {
                   <div key={cat} className="playlist-category">
                     <div className="category-header">
                       <span className="category-icon">{CATEGORY_ICONS[cat]}</span>
-                      <span className="category-label">{CATEGORY_LABELS[cat]}</span>
+                      <span className="category-label">{categoryLabels[cat]}</span>
                     </div>
                     {tracks.map((track) => {
                       const isCurrent = currentTrack?.id === track.id;

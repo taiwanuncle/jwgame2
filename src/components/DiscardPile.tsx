@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { Card } from '../types';
 import PlayingCard from './PlayingCard';
 import './Piles.css';
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export default function DiscardPile({ topCard, count, onClick, highlighted = false, disabled = false }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="pile discard-pile">
       <div className="pile-stack">
@@ -28,12 +31,12 @@ export default function DiscardPile({ topCard, count, onClick, highlighted = fal
           />
         ) : (
           <div className="empty-pile">
-            <span className="empty-text">비어있음</span>
+            <span className="empty-text">{t('game.empty')}</span>
           </div>
         )}
       </div>
-      <span className="pile-count">{count}장</span>
-      <span className="pile-label">버린 카드</span>
+      <span className="pile-count">{count}{t('lobby.cardsSuffix')}</span>
+      <span className="pile-label">{t('game.discardPileLabel')}</span>
     </div>
   );
 }

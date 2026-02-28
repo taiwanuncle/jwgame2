@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, PlayerCard, ActionLogEntry, Suit, Rank } from '../types';
 import PlayingCard from '../components/PlayingCard';
@@ -23,30 +24,32 @@ import './GamePage.css';
 
 const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐯','🐮'];
 
-function formatAction(entry: ActionLogEntry, myId?: string): string {
-  const name = entry.playerId === myId ? '나' : entry.playerName;
+type TFunc = (key: string, options?: Record<string, unknown>) => string;
+
+function formatAction(entry: ActionLogEntry, myId: string | undefined, t: TFunc): string {
+  const name = entry.playerId === myId ? t('game.me') : entry.playerName;
 
   switch (entry.action) {
     case 'draw_from_pile':
-      return `${name}(이)가 뽑기 더미에서 카드를 가져감`;
+      return t('game.drawFromPile', { name });
     case 'draw_from_discard': {
       const card = entry.details.drawnCard;
-      const cardStr = card ? `${card.rank}` : '카드';
-      return `${name}(이)가 버린 카드에서 ${cardStr}을 가져감`;
+      const cardStr = card ? `${card.rank}` : t('game.card');
+      return t('game.drawFromDiscard', { name, card: cardStr });
     }
     case 'swap_card': {
       const disc = entry.details.discardedCard;
-      const discStr = disc ? `${disc.rank}` : '카드';
-      return `${name}(이)가 카드 교환 → ${discStr} 버림`;
+      const discStr = disc ? `${disc.rank}` : t('game.card');
+      return t('game.swapCard', { name, card: discStr });
     }
     case 'discard_and_flip':
-      return `${name}(이)가 카드를 버리고 한 장 뒤집음`;
+      return t('game.discardAndFlip', { name });
     case 'all_face_up':
-      return `${name}(이)가 모든 카드 공개! 마지막 턴!`;
+      return t('game.allFaceUp', { name });
     case 'peek':
-      return `${name}(이)가 카드를 확인함`;
+      return t('game.peek', { name });
     default:
-      return `${name}(이)가 행동함`;
+      return t('game.defaultAction', { name });
   }
 }
 
@@ -67,16 +70,17 @@ interface Props {
 let toastIdCounter = 0;
 
 function AdvancedModePopup({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="advanced-popup-overlay" onClick={onClose}>
       <div className="advanced-popup" onClick={(e) => e.stopPropagation()}>
-        <h3>상급자 모드</h3>
+        <h3>{t('game.advancedTitle')}</h3>
         <ul>
-          <li>🃏 <strong>스트레이트</strong>: 연속 4장 → 합계의 마이너스</li>
-          <li>✖️ <strong>배수</strong>: 끝에서 2번째 라운드 x2, 마지막 x3</li>
-          <li>🧠 <strong>카드 메모 없음</strong>: 본 카드를 기억해야 함</li>
+          <li>🃏 <strong>{t('game.straightRule')}</strong></li>
+          <li>✖️ <strong>{t('game.multiplierRule')}</strong></li>
+          <li>🧠 <strong>{t('game.memoRule')}</strong></li>
         </ul>
-        <button className="btn btn-primary" onClick={onClose}>확인</button>
+        <button className="btn btn-primary" onClick={onClose}>{t('game.confirm')}</button>
       </div>
     </div>
   );
@@ -95,6 +99,7 @@ export default function GamePage({
   onNextRound,
   onSendChat,
 }: Props) {
+  const { t } = useTranslation();
   const [actionMode, setActionMode] = useState<'swap' | 'discard' | null>(null);
   const [peekedCards, setPeekedCards] = useState<Set<number>>(new Set());
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -143,10 +148,10 @@ export default function GamePage({
         const totalR = gameState.roomOptions.totalRounds;
         const curR = gameState.currentRound;
         if (curR === totalR) {
-          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '🔥 마지막 라운드! 점수 x3!!', type: 'alert' }]);
+          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: t('game.lastRoundX3'), type: 'alert' }]);
           playMultiplierAlert();
         } else if (curR === totalR - 1) {
-          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '⚡ 이번 라운드 점수 x2!', type: 'alert' }]);
+          setToasts((prev) => [...prev, { id: ++toastIdCounter, message: t('game.roundX2'), type: 'alert' }]);
           playMultiplierAlert();
         }
       }
@@ -155,11 +160,11 @@ export default function GamePage({
     }
     // Show chat available toast when round scoring starts
     if (curr === 'round_scoring' && prev !== 'round_scoring') {
-      setToasts((prev) => [...prev, { id: ++toastIdCounter, message: '💬 채팅이 가능합니다!', type: 'info' }]);
+      setToasts((prev) => [...prev, { id: ++toastIdCounter, message: t('game.chatAvailable'), type: 'info' }]);
       playRoundEnd();
     }
     prevPhaseRef.current = curr;
-  }, [gameState.phase, gameState.roomOptions.gameMode]);
+  }, [gameState.phase, gameState.roomOptions.gameMode, t]);
 
   // === Scoring confetti for pairs/straights ===
   useEffect(() => {
@@ -213,14 +218,14 @@ export default function GamePage({
       const newEntries = log.slice(prevLen);
       const newToasts: ToastItem[] = newEntries.map((entry) => ({
         id: ++toastIdCounter,
-        message: formatAction(entry, gameState.myId),
+        message: formatAction(entry, gameState.myId, t),
         type: entry.action === 'all_face_up' ? 'alert' as const : 'info' as const,
       }));
       setToasts((prev) => [...prev, ...newToasts]);
     }
 
     prevLogLenRef.current = log.length;
-  }, [gameState.actionLog, gameState.myId]);
+  }, [gameState.actionLog, gameState.myId, t]);
 
   // Reset log ref on round change
   useEffect(() => {
@@ -353,34 +358,34 @@ export default function GamePage({
   const getStatusMessage = (): string => {
     if (gameState.phase === 'peeking') {
       return gameState.peekingDone
-        ? '다른 플레이어를 기다리는 중...'
-        : '앞줄(아래) 카드를 클릭하여 확인하세요!';
+        ? t('game.waitingOther')
+        : t('game.clickFrontRow');
     }
-    if (gameState.phase === 'round_scoring') return '라운드 결과를 확인하세요';
+    if (gameState.phase === 'round_scoring') return t('game.roundResultMsg');
 
     if (!isMyTurn) {
       switch (myTurnPhase) {
-        case 'draw_choice': return '뽑기 더미 또는 버린 카드에서 카드를 가져오세요';
-        case 'thank_you': return '땡큐! 버튼을 눌러주세요';
+        case 'draw_choice': return t('game.drawChoice');
+        case 'thank_you': return t('game.thankYouMsg');
         case 'drawn_card_action': {
-          if (actionMode === 'swap') return '교환할 카드를 선택하세요';
-          if (actionMode === 'discard') return '뒤집을 카드를 선택하세요 (뒷면만 가능)';
-          return '교환하기 또는 버리기를 선택하세요';
+          if (actionMode === 'swap') return t('game.swapSelect');
+          if (actionMode === 'discard') return t('game.flipSelect');
+          return t('game.swapOrDiscard');
         }
-        case 'select_own_card': return '교환할 카드를 선택하세요';
+        case 'select_own_card': return t('game.swapSelect');
         default: return '';
       }
     }
 
     switch (myTurnPhase) {
-      case 'draw_choice': return '뽑기 더미 또는 버린 카드에서 카드를 가져오세요';
-      case 'thank_you': return '땡큐! 버튼을 눌러주세요';
+      case 'draw_choice': return t('game.drawChoice');
+      case 'thank_you': return t('game.thankYouMsg');
       case 'drawn_card_action': {
-        if (actionMode === 'swap') return '교환할 카드를 선택하세요';
-        if (actionMode === 'discard') return '뒤집을 카드를 선택하세요 (뒷면만 가능)';
-        return '교환하기 또는 버리기를 선택하세요';
+        if (actionMode === 'swap') return t('game.swapSelect');
+        if (actionMode === 'discard') return t('game.flipSelect');
+        return t('game.swapOrDiscard');
       }
-      case 'select_own_card': return '교환할 카드를 선택하세요';
+      case 'select_own_card': return t('game.swapSelect');
       default: return '';
     }
   };
@@ -422,7 +427,7 @@ export default function GamePage({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
           >
-            라운드 {roundResult.round} 결과
+            {t('game.roundResultTitle', { round: roundResult.round })}
           </motion.h2>
           {roundResult.roundMultiplier > 1 && (
             <motion.div
@@ -431,7 +436,7 @@ export default function GamePage({
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
             >
-              x{roundResult.roundMultiplier} 배수!
+              {t('game.multiplierBadge', { mult: roundResult.roundMultiplier })}
             </motion.div>
           )}
           <div className="score-results">
@@ -448,12 +453,12 @@ export default function GamePage({
                   <span className="score-rank">{i === 0 ? '🏆' : `${i + 1}`}</span>
                   <span className="score-name">{ps.nickname}</span>
                   <div className="score-details">
-                    <span className="score-raw">기본: {ps.rawScore}</span>
+                    <span className="score-raw">{t('game.raw', { score: ps.rawScore })}</span>
                     {ps.pairBonuses.length > 0 && (
-                      <span className="score-pair">페어: -{ps.pairBonuses.reduce((a, b) => a + b.saved, 0)}</span>
+                      <span className="score-pair">{t('game.pair', { saved: ps.pairBonuses.reduce((a, b) => a + b.saved, 0) })}</span>
                     )}
                     {ps.straightBonus && (
-                      <span className="score-straight">스트레이트: {ps.straightBonus.bonus}</span>
+                      <span className="score-straight">{t('game.straight', { bonus: ps.straightBonus.bonus })}</span>
                     )}
                     {ps.multiplier > 1 && (
                       <span className="score-mult">x{ps.multiplier}</span>
@@ -465,7 +470,7 @@ export default function GamePage({
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: i * 0.12 + 0.3, duration: 0.5, type: 'spring', stiffness: 200, damping: 15 }}
                   >
-                    {ps.finalScore}점
+                    {ps.finalScore}{t('game.pointSuffix')}
                   </motion.span>
                 </motion.div>
               ))}
@@ -520,15 +525,15 @@ export default function GamePage({
                               size={revealSize}
                             />
                             {isStraight && (
-                              <span className="pair-badge straight" style={{ background: STRAIGHT_COLOR }}>스트레이트!</span>
+                              <span className="pair-badge straight" style={{ background: STRAIGHT_COLOR }}>{t('game.straightBadge')}</span>
                             )}
                             {!isStraight && pairInfo && (
                               <span className={`pair-badge${pairInfo.isZero ? ' zero' : ''}`} style={{ background: pairInfo.color }}>
-                                {pairInfo.isZero ? '0점!' : '페어!'}
+                                {pairInfo.isZero ? t('game.zeroBadge') : t('game.pairBadge')}
                               </span>
                             )}
                             {!isStraight && isSoloZero && (
-                              <span className="pair-badge zero" style={{ background: '#fdd835' }}>0점!</span>
+                              <span className="pair-badge zero" style={{ background: '#fdd835' }}>{t('game.zeroBadge')}</span>
                             )}
                           </motion.div>
                         );
@@ -550,10 +555,10 @@ export default function GamePage({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {gameState.currentRound >= gameState.roomOptions.totalRounds ? '최종 결과 보기' : '다음 라운드'}
+                {gameState.currentRound >= gameState.roomOptions.totalRounds ? t('game.finalResult') : t('game.nextRound')}
               </motion.button>
             )}
-            <button className="btn btn-ghost" onClick={() => setShowCardLog(true)}>카드 로그 📋</button>
+            <button className="btn btn-ghost" onClick={() => setShowCardLog(true)}>{t('game.cardLogBtn')}</button>
           </div>
         </div>
         <CardLogModal isOpen={showCardLog} onClose={() => setShowCardLog(false)} actionLog={gameState.actionLog} myId={gameState.myId} />
@@ -573,15 +578,15 @@ export default function GamePage({
       {showScoreboard && (
         <div className="advanced-popup-overlay" onClick={() => setShowScoreboard(false)}>
           <div className="scoreboard-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>📊 점수판</h3>
+            <h3>📊 {t('game.scoreboard').replace(' 📊', '')}</h3>
             <table className="scoreboard-table">
               <thead>
                 <tr>
-                  <th>플레이어</th>
+                  <th>{t('game.player')}</th>
                   {Array.from({ length: gameState.currentRound }, (_, i) => (
                     <th key={i}>R{i + 1}</th>
                   ))}
-                  <th>합계</th>
+                  <th>{t('game.total')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -599,7 +604,7 @@ export default function GamePage({
                 ))}
               </tbody>
             </table>
-            <button className="btn btn-primary" onClick={() => setShowScoreboard(false)}>닫기</button>
+            <button className="btn btn-primary" onClick={() => setShowScoreboard(false)}>{t('game.close')}</button>
           </div>
         </div>
       )}
@@ -634,18 +639,18 @@ export default function GamePage({
             R{gameState.currentRound}/{gameState.roomOptions.totalRounds}
           </span>
           {gameState.roomOptions.gameMode === 'advanced' && (
-            <span className="badge badge-warning">상급자</span>
+            <span className="badge badge-warning">{t('game.advancedBadge')}</span>
           )}
         </div>
         <div className="header-center">
           {(gameState.phase === 'last_turn') && (
-            <span className="last-turn-alert">🔔 마지막 턴!</span>
+            <span className="last-turn-alert">{t('game.lastTurnAlert')}</span>
           )}
         </div>
         <div className="header-right">
-          {me && <span className="my-score">{me.totalScore}점</span>}
-          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>점수판 📊</button>
-          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowCardLog(true)}>로그 📋</button>
+          {me && <span className="my-score">{me.totalScore}{t('game.pointSuffix')}</span>}
+          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowScoreboard(true)}>{t('game.scoreboard')}</button>
+          <button className="btn btn-ghost scoreboard-btn" onClick={() => setShowCardLog(true)}>{t('game.cardLog')}</button>
           <MusicToggle />
         </div>
       </div>
@@ -660,8 +665,8 @@ export default function GamePage({
             <div className="other-info">
               <span className="other-avatar">{AVATARS[p.avatarIndex] || '🎴'}</span>
               <span className="other-name">{p.nickname}</span>
-              <span className="other-score">{p.totalScore}점</span>
-              {!p.connected && <span className="disconnect-badge">끊김</span>}
+              <span className="other-score">{p.totalScore}{t('game.pointSuffix')}</span>
+              {!p.connected && <span className="disconnect-badge">{t('game.disconnected')}</span>}
             </div>
             <OpponentCards
               cards={p.cards}
@@ -718,7 +723,7 @@ export default function GamePage({
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
             <div className="drawn-card-display">
-              <span className="drawn-label">뽑은 카드</span>
+              <span className="drawn-label">{t('game.drawnCard')}</span>
               <motion.div
                 initial={{ rotateY: -90, scale: 0.7 }}
                 animate={{ rotateY: 0, scale: 1 }}
@@ -744,7 +749,7 @@ export default function GamePage({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
               >
-                땡큐! 🎉
+                {t('game.thankYouBtn')}
               </motion.button>
             )}
 
@@ -757,10 +762,10 @@ export default function GamePage({
                 transition={{ delay: 0.15, duration: 0.3 }}
               >
                 <button className="btn btn-primary" onClick={() => setActionMode('swap')}>
-                  교환하기
+                  {t('game.swap')}
                 </button>
                 <button className="btn btn-outline" onClick={() => setActionMode('discard')}>
-                  버리기
+                  {t('game.discard')}
                 </button>
               </motion.div>
             )}
@@ -768,7 +773,7 @@ export default function GamePage({
             {/* Cancel action mode */}
             {actionMode && (
               <button className="btn btn-ghost" onClick={() => setActionMode(null)}>
-                취소
+                {t('game.cancel')}
               </button>
             )}
           </motion.div>
@@ -794,7 +799,7 @@ export default function GamePage({
                 onClick={onPeekDone}
                 style={{ marginTop: '8px' }}
               >
-                확인 완료
+                {t('game.confirmPeek')}
               </button>
             )}
           </>

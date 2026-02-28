@@ -1077,15 +1077,15 @@ io.on("connection", (socket) => {
   socket.on("join_room", ({ roomCode, nickname, avatarIndex }) => {
     const room = rooms.get(roomCode);
     if (!room) {
-      socket.emit("error_msg", { message: "방을 찾을 수 없습니다" });
+      socket.emit("error_msg", { message: "ERR_ROOM_NOT_FOUND" });
       return;
     }
     if (room.phase !== "waiting") {
-      socket.emit("error_msg", { message: "이미 게임이 진행중입니다" });
+      socket.emit("error_msg", { message: "ERR_GAME_IN_PROGRESS" });
       return;
     }
     if (room.players.length >= MAX_PLAYERS) {
-      socket.emit("error_msg", { message: "방이 가득 찼습니다" });
+      socket.emit("error_msg", { message: "ERR_ROOM_FULL" });
       return;
     }
 
@@ -1122,12 +1122,12 @@ io.on("connection", (socket) => {
   socket.on("rejoin_room", ({ roomCode, persistentId }) => {
     const room = rooms.get(roomCode);
     if (!room) {
-      socket.emit("error_msg", { message: "방을 찾을 수 없습니다" });
+      socket.emit("error_msg", { message: "ERR_ROOM_NOT_FOUND" });
       return;
     }
     const player = room.players.find((p) => p.id === persistentId);
     if (!player) {
-      socket.emit("error_msg", { message: "플레이어를 찾을 수 없습니다" });
+      socket.emit("error_msg", { message: "ERR_PLAYER_NOT_FOUND" });
       return;
     }
 

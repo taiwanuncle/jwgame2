@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import './InstallPrompt.css';
 
 const DISMISS_KEY = 'pwa_install_dismissed';
@@ -27,6 +28,8 @@ function hideUntilEndOfDay(key: string) {
 }
 
 export default function InstallPrompt() {
+  const { t } = useTranslation();
+
   // === KakaoTalk browser warning ===
   const [showKakao, setShowKakao] = useState(false);
   const [kakaoHideToday, setKakaoHideToday] = useState(false);
@@ -113,21 +116,21 @@ export default function InstallPrompt() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
           >
             <div className="kakao-icon">⚠️</div>
-            <h3 className="kakao-title">카카오톡 브라우저 안내</h3>
+            <h3 className="kakao-title">{t('pwa.kakaoTitle')}</h3>
             <p className="kakao-desc">
-              카카오톡 브라우저에서 접속하셨습니다.<br />
-              카톡 알림이 오면 게임이 튕길 수 있어요!<br />
-              <strong>다른 브라우저</strong>로 열면 안정적으로 즐길 수 있습니다.
+              {t('pwa.kakaoDesc1')}<br />
+              {t('pwa.kakaoDesc2')}<br />
+              <strong>{t('pwa.kakaoDesc3')}</strong>{t('pwa.kakaoDesc4')}
             </p>
             <button className="btn btn-primary kakao-open-btn" onClick={handleKakaoOpen}>
-              🌐 외부 브라우저로 열기
+              {t('pwa.openBrowser')}
             </button>
             <div className="install-prompt-bottom">
               <label className="install-prompt-checkbox">
                 <input type="checkbox" checked={kakaoHideToday} onChange={(e) => setKakaoHideToday(e.target.checked)} />
-                <span>오늘 하루 보지 않기</span>
+                <span>{t('pwa.hideToday')}</span>
               </label>
-              <button className="btn btn-ghost install-prompt-close" onClick={handleKakaoClose}>닫기</button>
+              <button className="btn btn-ghost install-prompt-close" onClick={handleKakaoClose}>{t('pwa.close')}</button>
             </div>
           </motion.div>
         </motion.div>
@@ -151,30 +154,26 @@ export default function InstallPrompt() {
             <div className="install-prompt-content">
               <div className="install-prompt-icon">📲</div>
               <div className="install-prompt-text">
-                <p className="install-prompt-title">홈 화면에 추가하세요!</p>
+                <p className="install-prompt-title">{t('pwa.installTitle')}</p>
                 {isIOS ? (
-                  <p className="install-prompt-desc">
-                    Safari 하단 공유 버튼(□↑)을 누르고 &apos;홈 화면에 추가&apos;를 선택하면 앱처럼 사용할 수 있어요!
-                  </p>
+                  <p className="install-prompt-desc">{t('pwa.iosDesc')}</p>
                 ) : (
-                  <p className="install-prompt-desc">
-                    앱처럼 바로 실행할 수 있어요! 설치 버튼을 눌러보세요.
-                  </p>
+                  <p className="install-prompt-desc">{t('pwa.androidDesc')}</p>
                 )}
               </div>
             </div>
             <div className="install-prompt-actions">
               {!isIOS && deferredPrompt && (
                 <button className="btn btn-primary install-prompt-install-btn" onClick={handleInstall}>
-                  홈 화면에 추가
+                  {t('pwa.installBtn')}
                 </button>
               )}
               <div className="install-prompt-bottom">
                 <label className="install-prompt-checkbox">
                   <input type="checkbox" checked={installHideToday} onChange={(e) => setInstallHideToday(e.target.checked)} />
-                  <span>오늘 하루 보지 않기</span>
+                  <span>{t('pwa.hideToday')}</span>
                 </label>
-                <button className="btn btn-ghost install-prompt-close" onClick={handleInstallDismiss}>닫기</button>
+                <button className="btn btn-ghost install-prompt-close" onClick={handleInstallDismiss}>{t('pwa.close')}</button>
               </div>
             </div>
           </motion.div>

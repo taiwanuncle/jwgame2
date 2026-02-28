@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import './i18n';
 import { useSocket } from './hooks/useSocket';
 import { audioManager } from './utils/audioManager';
 import type { MusicCategory } from './utils/audioManager';
@@ -8,6 +10,7 @@ import GamePage from './pages/GamePage';
 import GameOverPage from './pages/GameOverPage';
 
 function App() {
+  const { t } = useTranslation();
   const {
     gameState,
     roundResult,
@@ -71,7 +74,7 @@ function App() {
       return (
         <div className="page" style={{ justifyContent: 'center', alignItems: 'center' }}>
           <p style={{ fontSize: 'var(--font-size-lg)', color: 'var(--text-secondary)' }}>
-            게임 준비 중...
+            {t('app.preparing')}
           </p>
         </div>
       );

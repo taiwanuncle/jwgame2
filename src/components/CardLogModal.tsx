@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { ActionLogEntry, Suit } from '../types';
 import './CardLogModal.css';
 
@@ -16,20 +17,22 @@ const SUIT_SYMBOLS: Record<Suit, string> = {
 };
 
 export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   // Collect all revealed/discarded cards from log
   const cardEvents: { card: string; isRed: boolean; action: string; player: string }[] = [];
 
   for (const entry of actionLog) {
-    const name = entry.playerId === myId ? '나' : entry.playerName;
+    const name = entry.playerId === myId ? t('game.me') : entry.playerName;
 
     if (entry.details.drawnCard && entry.action === 'draw_from_discard') {
       const c = entry.details.drawnCard;
       cardEvents.push({
         card: `${c.rank}${SUIT_SYMBOLS[c.suit]}`,
         isRed: c.suit === 'heart' || c.suit === 'diamond',
-        action: '버림더미에서 가져감',
+        action: t('log.takenFromDiscard'),
         player: name,
       });
     }
@@ -39,7 +42,7 @@ export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props
       cardEvents.push({
         card: `${c.rank}${SUIT_SYMBOLS[c.suit]}`,
         isRed: c.suit === 'heart' || c.suit === 'diamond',
-        action: '버림',
+        action: t('log.discarded'),
         player: name,
       });
     }
@@ -49,7 +52,7 @@ export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props
       cardEvents.push({
         card: `${c.rank}${SUIT_SYMBOLS[c.suit]}`,
         isRed: c.suit === 'heart' || c.suit === 'diamond',
-        action: '공개',
+        action: t('log.revealed'),
         player: name,
       });
     }
@@ -58,9 +61,9 @@ export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props
   return (
     <div className="advanced-popup-overlay" onClick={onClose}>
       <div className="card-log-modal" onClick={(e) => e.stopPropagation()}>
-        <h3>카드 로그</h3>
+        <h3>{t('log.title')}</h3>
         {cardEvents.length === 0 ? (
-          <p className="log-empty">아직 공개된 카드가 없습니다.</p>
+          <p className="log-empty">{t('log.empty')}</p>
         ) : (
           <div className="log-list">
             {cardEvents.map((ev, i) => (
@@ -68,13 +71,13 @@ export default function CardLogModal({ isOpen, onClose, actionLog, myId }: Props
                 <span className="log-num">{i + 1}</span>
                 <span className={`log-card ${ev.isRed ? 'log-red' : 'log-black'}`}>{ev.card}</span>
                 <span className="log-detail">{ev.player} — {ev.action}</span>
-                {i === 0 && <span className="log-tag log-tag-first">처음</span>}
-                {i === cardEvents.length - 1 && <span className="log-tag log-tag-last">최근</span>}
+                {i === 0 && <span className="log-tag log-tag-first">{t('log.first')}</span>}
+                {i === cardEvents.length - 1 && <span className="log-tag log-tag-last">{t('log.latest')}</span>}
               </div>
             ))}
           </div>
         )}
-        <button className="btn btn-primary" onClick={onClose}>닫기</button>
+        <button className="btn btn-primary" onClick={onClose}>{t('log.close')}</button>
       </div>
     </div>
   );

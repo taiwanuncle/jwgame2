@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import confetti from 'canvas-confetti';
 import type { GameStateFromServer, RoundResult, ChatMessage } from '../types';
 import GlobalChat from '../components/GlobalChat';
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onBackToLobby, onSendChat }: Props) {
+  const { t } = useTranslation();
   const sortedPlayers = [...gameState.players].sort((a, b) => a.totalScore - b.totalScore);
   const winners = sortedPlayers.filter(p => p.totalScore === sortedPlayers[0]?.totalScore);
   const me = gameState.players.find(p => p.id === gameState.myId);
@@ -103,7 +105,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        <span style={{ WebkitTextFillColor: 'initial', backgroundClip: 'initial', WebkitBackgroundClip: 'initial', background: 'none' }}>🏆</span> 게임 종료!
+        <span style={{ WebkitTextFillColor: 'initial', backgroundClip: 'initial', WebkitBackgroundClip: 'initial', background: 'none' }}>🏆</span> {t('result.gameOver')}
       </motion.h1>
 
       {/* Winner highlight — supports co-winners */}
@@ -118,14 +120,14 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
             <>
               <span className="winner-avatar">{AVATARS[winners[0].avatarIndex] || '🎴'}</span>
               <div className="winner-info">
-                <span className="winner-label">우승</span>
+                <span className="winner-label">{t('result.winner')}</span>
                 <span className="winner-name">{winners[0].nickname}</span>
               </div>
-              <span className="winner-score">{winners[0].totalScore}점</span>
+              <span className="winner-score">{winners[0].totalScore}{t('result.pointSuffix')}</span>
             </>
           ) : (
             <div className="co-winner-list">
-              <span className="winner-label">공동 우승!</span>
+              <span className="winner-label">{t('result.coWinners')}</span>
               <div className="co-winner-players">
                 {winners.map((w) => (
                   <div key={w.id} className="co-winner-player">
@@ -134,7 +136,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
                   </div>
                 ))}
               </div>
-              <span className="winner-score">{winners[0].totalScore}점</span>
+              <span className="winner-score">{winners[0].totalScore}{t('result.pointSuffix')}</span>
             </div>
           )}
         </motion.div>
@@ -146,7 +148,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
       >
-        <h2>최종 순위</h2>
+        <h2>{t('result.finalRanking')}</h2>
         <div className="ranking-list">
           {sortedPlayers.map((p, i) => {
             // Calculate actual rank (tied players share same rank)
@@ -164,7 +166,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
               transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
             >
               <span className="rank-num">
-                {displayRank === 0 ? '🏆' : displayRank === 1 ? '🥈' : displayRank === 2 ? '🥉' : `${displayRank + 1}위`}
+                {displayRank === 0 ? '🏆' : displayRank === 1 ? '🥈' : displayRank === 2 ? '🥉' : `${displayRank + 1}${t('result.rankSuffix')}`}
               </span>
               <span className="rank-name">{p.nickname}</span>
               <div className="rank-rounds">
@@ -172,7 +174,7 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
                   <span key={ri} className="rank-round-score">{s}</span>
                 ))}
               </div>
-              <span className="rank-score">{p.totalScore}점</span>
+              <span className="rank-score">{p.totalScore}{t('result.pointSuffix')}</span>
             </motion.div>
             );
           })}
@@ -187,11 +189,11 @@ export default function GameOverPage({ gameState, chatMessages, onPlayAgain, onB
       >
         {isHost && (
           <button className="btn btn-primary btn-large" onClick={onPlayAgain}>
-            다시 하기
+            {t('result.playAgain')}
           </button>
         )}
         <button className="btn btn-outline btn-large" onClick={onBackToLobby}>
-          로비로 돌아가기
+          {t('result.backToLobby')}
         </button>
       </motion.div>
 

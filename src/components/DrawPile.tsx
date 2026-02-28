@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import PlayingCard from './PlayingCard';
 import './Piles.css';
 
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function DrawPile({ count, onClick, highlighted = false, disabled = false }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="pile draw-pile">
       <div className="pile-stack">
@@ -23,8 +26,8 @@ export default function DrawPile({ count, onClick, highlighted = false, disabled
           disabled={disabled || count === 0}
         />
       </div>
-      <span className="pile-count">{count}장</span>
-      <span className="pile-label">뽑기 더미</span>
+      <span className="pile-count">{count}{t('lobby.cardsSuffix')}</span>
+      <span className="pile-label">{t('game.drawPileLabel')}</span>
     </div>
   );
 }

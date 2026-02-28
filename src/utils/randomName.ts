@@ -1,13 +1,16 @@
 /**
  * Random nickname generator
- * Combines a Korean adjective (~100) + noun name (~140: animals + plants + famous people)
- * e.g. "용감한 호랑이", "졸린 해바라기", "느긋한 아인슈타인"
+ * Combines adjective + noun name per language
+ * KO: "용감한 호랑이", "졸린 해바라기"
+ * ZH-TW: "勇敢的 老虎", "聰明的 向日葵"
  */
 
 const MAX_NICKNAME_LENGTH = 12;
 const AVATAR_COUNT = 12; // number of avatars in AVATARS array
 
-const ADJECTIVES: string[] = [
+// ── Korean ──
+
+const KO_ADJECTIVES: string[] = [
   "용감한", "지혜로운", "겸손한", "씩씩한", "명랑한", "재빠른", "든든한", "활발한",
   "다정한", "충실한", "당당한", "꿋꿋한", "상냥한", "부지런한", "정직한", "슬기로운",
   "대담한", "온화한", "쾌활한", "단호한", "꼼꼼한", "느긋한", "열정적인", "소심한",
@@ -23,8 +26,7 @@ const ADJECTIVES: string[] = [
   "포근한", "알뜰한", "늠름한", "너그러운",
 ];
 
-/** Animals (~50) */
-const ANIMALS: string[] = [
+const KO_ANIMALS: string[] = [
   "호랑이", "사자", "독수리", "펭귄", "고래", "돌고래", "판다", "코끼리",
   "기린", "늑대", "여우", "토끼", "다람쥐", "고양이", "강아지", "곰",
   "수달", "해달", "부엉이", "올빼미", "매", "참새", "까치", "두루미",
@@ -34,8 +36,7 @@ const ANIMALS: string[] = [
   "잠자리", "무당벌레",
 ];
 
-/** Plants (~45) */
-const PLANTS: string[] = [
+const KO_PLANTS: string[] = [
   "해바라기", "장미", "벚꽃", "민들레", "튤립", "라벤더", "백합", "수선화",
   "은행나무", "소나무", "대나무", "단풍나무", "버드나무", "참나무", "매화", "목련",
   "코스모스", "국화", "동백", "진달래", "개나리", "아카시아", "선인장", "클로버",
@@ -44,8 +45,7 @@ const PLANTS: string[] = [
   "데이지", "아이리스", "카네이션", "프리지아", "수국",
 ];
 
-/** Famous people (~50, short recognizable names) */
-const CELEBRITIES: string[] = [
+const KO_CELEBRITIES: string[] = [
   "아인슈타인", "뉴턴", "에디슨", "다빈치", "피카소", "모차르트", "베토벤", "바흐",
   "셰익스피어", "간디", "링컨", "처칠", "나폴레옹", "클레오파트라", "콜럼버스",
   "다윈", "갈릴레이", "퀴리부인", "테슬라", "호킹",
@@ -58,19 +58,65 @@ const CELEBRITIES: string[] = [
   "해리포터", "셜록홈즈", "스파이더맨", "피노키오",
 ];
 
-/** All names combined */
-const ALL_NAMES: string[] = [...ANIMALS, ...PLANTS, ...CELEBRITIES];
+const KO_ALL_NAMES: string[] = [...KO_ANIMALS, ...KO_PLANTS, ...KO_CELEBRITIES];
+
+// ── Traditional Chinese ──
+
+const ZH_ADJECTIVES: string[] = [
+  "勇敢的", "聰明的", "謙虛的", "開朗的", "活潑的", "敏捷的", "可靠的", "溫柔的",
+  "忠實的", "堂堂的", "堅強的", "親切的", "勤勞的", "正直的", "機智的", "大膽的",
+  "溫和的", "快樂的", "果斷的", "細心的", "悠閒的", "熱情的", "害羞的", "爽朗的",
+  "純真的", "帥氣的", "善良的", "迅速的", "強壯的", "明亮的", "安靜的", "有力的",
+  "小小的", "可愛的", "嗜睡的", "飢餓的", "興奮的", "幸福的", "搞笑的", "古怪的",
+  "靈巧的", "緩慢的", "沉著的", "吵鬧的", "粗獷的", "柔軟的", "輕盈的", "認真的",
+  "調皮的", "耐心的", "感恩的", "歌唱的", "跳舞的", "奔跑的", "微笑的", "思考的",
+  "夢想的", "學習的", "助人的", "分享的", "等待的", "加油的", "感動的", "驚奇的",
+  "特別的", "珍貴的", "溫暖的", "涼爽的", "閃亮的", "發光的", "芬芳的", "美麗的",
+  "和平的", "自由的", "神祕的", "心動的", "舒適的", "節儉的", "威風的", "寬容的",
+];
+
+const ZH_ANIMALS: string[] = [
+  "老虎", "獅子", "老鷹", "企鵝", "鯨魚", "海豚", "熊貓", "大象",
+  "長頸鹿", "灰狼", "狐狸", "兔子", "松鼠", "小貓", "小狗", "熊",
+  "水獺", "貓頭鷹", "麻雀", "喜鵲", "白鶴", "天鵝", "鸚鵡", "變色龍",
+  "烏龜", "章魚", "水母", "鯊魚", "鮭魚", "獵豹", "花豹", "無尾熊",
+  "袋鼠", "河馬", "犀牛", "鱷魚", "倉鼠", "刺蝟", "狐獴", "羊駝",
+  "河狸", "鴨子", "蝴蝶", "蜻蜓", "瓢蟲",
+];
+
+const ZH_PLANTS: string[] = [
+  "向日葵", "玫瑰", "櫻花", "蒲公英", "鬱金香", "薰衣草", "百合", "水仙",
+  "銀杏", "松樹", "竹子", "楓樹", "柳樹", "橡樹", "梅花", "玉蘭",
+  "波斯菊", "菊花", "山茶花", "杜鵑花", "仙人掌", "三葉草", "紫羅蘭", "睡蓮",
+  "蓮花", "迷迭香", "橄欖", "木槿", "扶桑花", "雛菊", "鳶尾花", "康乃馨",
+  "小蒼蘭", "繡球花",
+];
+
+const ZH_CELEBRITIES: string[] = [
+  "愛因斯坦", "牛頓", "愛迪生", "達文西", "畢卡索", "莫札特", "貝多芬", "巴哈",
+  "莎士比亞", "甘地", "林肯", "邱吉爾", "拿破崙", "埃及豔后", "哥倫布",
+  "達爾文", "伽利略", "居里夫人", "特斯拉", "霍金",
+  "海明威", "托爾斯泰", "蕭邦", "梵谷", "莫內",
+  "乔丹", "梅西", "乔布斯", "比爾蓋茲",
+  "哈利波特", "乒乓球", "蜘蛛人", "皮諾丘",
+];
+
+const ZH_ALL_NAMES: string[] = [...ZH_ANIMALS, ...ZH_PLANTS, ...ZH_CELEBRITIES];
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 /** Generate a random avatar index + nickname */
-export function generateRandomName(): { avatarIndex: number; nickname: string } {
-  const adj = pickRandom(ADJECTIVES);
-  const name = pickRandom(ALL_NAMES);
+export function generateRandomName(lang?: string): { avatarIndex: number; nickname: string } {
+  const isZh = lang?.startsWith('zh');
+  const adjectives = isZh ? ZH_ADJECTIVES : KO_ADJECTIVES;
+  const allNames = isZh ? ZH_ALL_NAMES : KO_ALL_NAMES;
 
-  let nickname = `${adj} ${name}`;
+  const adj = pickRandom(adjectives);
+  const name = pickRandom(allNames);
+
+  let nickname = `${adj}${isZh ? '' : ' '}${name}`;
 
   // Truncate if too long for the 12-char limit
   if (nickname.length > MAX_NICKNAME_LENGTH) {

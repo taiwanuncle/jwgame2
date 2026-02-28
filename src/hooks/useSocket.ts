@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import i18n from '../i18n';
 import type {
   GameStateFromServer,
   RoundResult,
@@ -92,7 +93,8 @@ export function useSocket() {
     });
 
     socket.on('error_msg', ({ message }: { message: string }) => {
-      setErrorMsg(message);
+      const translated = i18n.exists(`error.${message}`) ? i18n.t(`error.${message}`) : message;
+      setErrorMsg(translated);
       setTimeout(() => setErrorMsg(''), 3000);
     });
 

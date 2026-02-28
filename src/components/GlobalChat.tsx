@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../types';
 import './GlobalChat.css';
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function GlobalChat({ messages, onSend, myId }: Props) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ export default function GlobalChat({ messages, onSend, myId }: Props) {
       {expanded ? (
         <>
           <div className="chat-header" onClick={() => setExpanded(false)}>
-            <span>채팅</span>
+            <span>{t('chat.title')}</span>
             <span className="chat-close">✕</span>
           </div>
           <div className="chat-messages">
@@ -72,7 +74,7 @@ export default function GlobalChat({ messages, onSend, myId }: Props) {
               value={input}
               onChange={(e) => setInput(e.target.value.slice(0, 100))}
               onKeyDown={handleKeyDown}
-              placeholder="메시지 입력..."
+              placeholder={t('chat.placeholder')}
               maxLength={100}
             />
             <button
@@ -87,7 +89,7 @@ export default function GlobalChat({ messages, onSend, myId }: Props) {
       ) : (
         <div className="chat-collapsed-row" onClick={() => { setExpanded(true); setTimeout(() => inputRef.current?.focus(), 100); }}>
           <span className="chat-preview">
-            {lastMsg ? `${lastMsg.nickname}: ${lastMsg.message}` : '채팅'}
+            {lastMsg ? `${lastMsg.nickname}: ${lastMsg.message}` : t('chat.title')}
           </span>
           <span className="chat-expand-icon">💬</span>
         </div>
