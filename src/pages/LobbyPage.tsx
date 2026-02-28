@@ -203,13 +203,36 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
               <span className="contact-label">📧 이메일</span>
               <a href="mailto:atshane81@gmail.com" className="contact-value">atshane81@gmail.com</a>
             </div>
+            <a
+              href="https://pf.kakao.com/_exghAX"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-kakao-btn"
+            >
+              💬 카카오톡 채널
+            </a>
           </div>
           <h3>후원</h3>
           <div className="donate-section">
             <p>이 게임이 재미있으셨다면 후원으로 응원해 주세요!</p>
-            <a href="https://qr.kakaopay.com/FN0023EGr" target="_blank" rel="noopener noreferrer" className="donate-link">
+            <a
+              href="https://qr.kakaopay.com/FN0023EGr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="donate-link donate-link--mobile"
+            >
               💛 카카오페이로 후원하기
             </a>
+            <div className="donate-qr-desktop">
+              <p className="donate-qr-label">PC에서는 QR코드를 스캔해 주세요</p>
+              <img
+                className="donate-qr-img"
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent("https://qr.kakaopay.com/FN0023EGr")}`}
+                alt="카카오페이 후원 QR코드"
+                width={180}
+                height={180}
+              />
+            </div>
           </div>
         </InfoModal>
       </div>

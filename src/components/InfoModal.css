@@ -164,6 +164,54 @@
   transform: scale(1.02);
 }
 
+/* Kakao channel button */
+.info-modal-body .contact-kakao-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  background: #FEE500;
+  color: #191919;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: var(--transition-fast);
+  text-align: center;
+}
+.info-modal-body .contact-kakao-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+/* Donate: mobile link + desktop QR */
+.donate-link--mobile {
+  display: inline-flex;
+}
+.donate-qr-desktop {
+  display: none;
+  text-align: center;
+}
+.donate-qr-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.donate-qr-img {
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-light);
+}
+@media (min-width: 768px) {
+  .donate-link--mobile { display: none; }
+  .donate-qr-desktop { display: block; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .donate-link--mobile { display: inline-flex !important; }
+  .donate-qr-desktop { display: none !important; }
+}
+
 @media (max-width: 480px) {
   .info-modal-overlay { padding: 12px; }
   .info-modal { padding: 20px; max-height: calc(100vh - 24px); }
