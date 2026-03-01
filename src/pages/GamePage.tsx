@@ -35,6 +35,12 @@ function formatAction(entry: ActionLogEntry, myId: string | undefined, t: TFunc)
     case 'draw_from_discard': {
       const card = entry.details.drawnCard;
       const cardStr = card ? `${card.rank}` : t('game.card');
+      const fromName = entry.details.fromPlayerName
+        ? (entry.details.fromPlayerId === myId ? t('game.me') : entry.details.fromPlayerName)
+        : null;
+      if (fromName) {
+        return t('game.drawFromDiscardFrom', { name, card: cardStr, from: fromName });
+      }
       return t('game.drawFromDiscard', { name, card: cardStr });
     }
     case 'swap_card': {
@@ -324,7 +330,11 @@ export default function GamePage({
           setActionMode(null);
         }
       } else if (myTurnPhase === 'select_own_card') {
-        // From discard pile (must swap) — allow any card
+        // From discard pile (must swap) — block face-up cards if face-down exists
+        if (card && card.faceUp) {
+          const hasFaceDown = myCards.some((c) => !c.faceUp);
+          if (hasFaceDown) return;
+        }
         doSwap();
       }
     }
@@ -338,8 +348,9 @@ export default function GamePage({
     if (!isMyTurn) return [];
 
     if (myTurnPhase === 'select_own_card') {
-      // From discard pile — must swap, allow all cards
-      return myCards.map((c) => c.position);
+      // From discard pile — must swap, only face-down cards (face-up cards cannot be swapped)
+      const faceDown = myCards.filter((c) => !c.faceUp);
+      return faceDown.length > 0 ? faceDown.map((c) => c.position) : myCards.map((c) => c.position);
     }
     if (myTurnPhase === 'drawn_card_action') {
       if (actionMode === 'swap') {
@@ -797,6 +808,7 @@ export default function GamePage({
               <button
                 className="btn btn-primary"
                 onClick={onPeekDone}
+                disabled={!frontRowPositions.every((p) => peekedCards.has(p))}
                 style={{ marginTop: '8px' }}
               >
                 {t('game.confirmPeek')}

@@ -128,6 +128,7 @@ const zhTw = {
       card: "牌",
       drawFromPile: "{{name}}從牌庫取了一張牌",
       drawFromDiscard: "{{name}}從棄牌堆取了{{card}}",
+      drawFromDiscardFrom: "{{name}}取走了{{from}}的{{card}}（謝謝！）",
       swapCard: "{{name}}交換卡牌 → 棄掉{{card}}",
       discardAndFlip: "{{name}}丟棄牌並翻開一張",
       allFaceUp: "{{name}}所有卡牌已翻開！最後一回合！",

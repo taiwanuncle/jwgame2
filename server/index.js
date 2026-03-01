@@ -340,6 +340,7 @@ function dealCards(room) {
   const deckCount = playerCount <= 3 ? 1 : 2;
   room.drawPile = createDeck(deckCount);
   room.discardPile = [];
+  room.lastDiscardedBy = null; // { playerId, playerName } — tracks who discarded the top card
 
   room.players.forEach((p) => {
     p.cards = [];
@@ -567,11 +568,16 @@ function drawFromDiscardInternal(room, playerId) {
 
   if (!player.isBot) startTurnTimer(room); // Reset timer on action
 
+  const fromPlayer = room.lastDiscardedBy;
   room.actionLog.push({
     playerId,
     playerName: player.nickname,
     action: "draw_from_discard",
-    details: { drawnCard: card },
+    details: {
+      drawnCard: card,
+      fromPlayerId: fromPlayer?.playerId || null,
+      fromPlayerName: fromPlayer?.playerName || null,
+    },
     timestamp: Date.now(),
   });
 
@@ -600,8 +606,15 @@ function swapCardInternal(room, playerId, position) {
   const targetSlot = player.cards.find((c) => c.position === position);
   if (!targetSlot) return false;
 
+  // Block swapping face-up cards when face-down cards still exist
+  if (targetSlot.faceUp) {
+    const hasFaceDown = player.cards.some((c) => !c.faceUp);
+    if (hasFaceDown) return false;
+  }
+
   const replacedCard = targetSlot.card;
   room.discardPile.push(replacedCard);
+  room.lastDiscardedBy = { playerId, playerName: player.nickname };
   targetSlot.card = player.drawnCard;
   targetSlot.faceUp = true;
 
@@ -633,6 +646,7 @@ function discardAndFlipInternal(room, playerId, flipPosition) {
   if (!targetSlot || targetSlot.faceUp) return false;
 
   room.discardPile.push(player.drawnCard);
+  room.lastDiscardedBy = { playerId, playerName: player.nickname };
   targetSlot.faceUp = true;
 
   room.actionLog.push({

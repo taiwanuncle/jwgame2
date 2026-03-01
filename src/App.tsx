@@ -42,9 +42,11 @@ function App() {
     let category: MusicCategory;
     if (isLobby || isWaiting) {
       category = 'opening';
-    } else if (gameState?.phase === 'game_over' || gameState?.phase === 'round_scoring') {
+    } else if (gameState?.phase === 'game_over') {
       category = 'celebration';
     } else {
+      // playing, peeking, round_scoring — keep "playing" category
+      // (round_scoring is brief; switching music disrupts experience)
       category = 'playing';
     }
     audioManager.playCategory(category);

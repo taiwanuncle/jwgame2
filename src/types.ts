@@ -82,6 +82,8 @@ export interface ActionLogEntry {
     swappedPosition?: number;
     flippedPosition?: number;
     revealedCard?: Card;
+    fromPlayerId?: string | null;
+    fromPlayerName?: string | null;
   };
   timestamp: number;
 }

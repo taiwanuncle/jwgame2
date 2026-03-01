@@ -128,6 +128,7 @@ const ko = {
       card: "카드",
       drawFromPile: "{{name}}(이)가 뽑기 더미에서 카드를 가져감",
       drawFromDiscard: "{{name}}(이)가 버린 카드에서 {{card}}을 가져감",
+      drawFromDiscardFrom: "{{name}}(이)가 {{from}}의 {{card}}을 가져감 (땡큐!)",
       swapCard: "{{name}}(이)가 카드 교환 → {{card}} 버림",
       discardAndFlip: "{{name}}(이)가 카드를 버리고 한 장 뒤집음",
       allFaceUp: "{{name}}(이)가 모든 카드 공개! 마지막 턴!",
