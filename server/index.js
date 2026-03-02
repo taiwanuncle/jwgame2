@@ -137,7 +137,17 @@ function findPairs(cards) {
   return pairs;
 }
 
+// Get actual card rank value for straight calculation (10=10, K=13, not game score)
+function getStraightCardValue(rank) {
+  return getRankOrder(rank); // A=1, 2=2, ..., 10=10, J=11, Q=12, K=13
+}
+
 // Find best 4-card straight among cards (advanced mode)
+// Rules:
+// - A-high straights allowed (J-Q-K-A is valid via A=14 for sequence detection)
+// - Straight value uses actual rank values (10=10, J=11, Q=12, K=13) but A is always 1
+// - Pick the straight with the highest sum (most beneficial negative bonus)
+// - Example: 10-J-Q-K (sum 46, bonus -46) beats J-Q-K-A (sum 37, bonus -37)
 function findStraight(cards) {
   if (cards.length < 4) return null;
 
@@ -156,11 +166,12 @@ function findStraight(cards) {
   }
 
   let bestStraight = null;
-  let bestBonus = 0;
+  let bestSum = 0; // prefer highest sum (most negative bonus)
 
   for (const combo of combos) {
     const values = combo.map((c) => getRankOrder(c.card.rank)).sort((a, b) => a - b);
 
+    // Check normal sequence (e.g., 3-4-5-6, 10-J-Q-K)
     let isStraight = true;
     for (let i = 1; i < values.length; i++) {
       if (values[i] !== values[i - 1] + 1) {
@@ -169,6 +180,7 @@ function findStraight(cards) {
       }
     }
 
+    // Check A-high sequence (A as 14: e.g., J-Q-K-A)
     if (!isStraight && values.includes(1)) {
       const altValues = values.map((v) => (v === 1 ? 14 : v)).sort((a, b) => a - b);
       isStraight = true;
@@ -181,10 +193,12 @@ function findStraight(cards) {
     }
 
     if (isStraight) {
-      const sum = combo.reduce((acc, c) => acc + getCardValue(c.card.rank), 0);
+      // Use actual rank values for sum, but A is always 1 (not 14)
+      const sum = combo.reduce((acc, c) => acc + getStraightCardValue(c.card.rank), 0);
       const bonus = -sum;
-      if (bonus < bestBonus || bestStraight === null) {
-        bestBonus = bonus;
+      // Pick the straight with the highest sum (most negative bonus)
+      if (sum > bestSum || bestStraight === null) {
+        bestSum = sum;
         bestStraight = {
           positions: combo.map((c) => c.position),
           bonus,
@@ -216,7 +230,23 @@ function calculateRoundScore(playerCards, cardCount, gameMode, currentRound, tot
   if (gameMode === "advanced") {
     straightBonus = findStraight(playerCards);
     if (straightBonus) {
-      score = straightBonus.bonus;
+      // Straight cards: bonus is negative of their actual rank values
+      // Remaining cards (not in straight): use normal game score, with pair bonuses if applicable
+      const straightPositions = new Set(straightBonus.positions);
+      let remainingScore = 0;
+      for (const pc of playerCards) {
+        if (pc.card && !straightPositions.has(pc.position)) {
+          remainingScore += getCardValue(pc.card.rank);
+        }
+      }
+      // Subtract pair savings only for pairs whose BOTH cards are outside the straight
+      let remainingPairSavings = 0;
+      for (const pair of pairs) {
+        if (pair.positions.every((p) => !straightPositions.has(p))) {
+          remainingPairSavings += pair.saved;
+        }
+      }
+      score = straightBonus.bonus + remainingScore - remainingPairSavings;
     }
   }
 

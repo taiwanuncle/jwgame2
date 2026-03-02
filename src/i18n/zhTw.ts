@@ -109,7 +109,7 @@ const zhTw = {
       zeroBadge: "0分！",
       // Advanced popup
       advancedTitle: "進階模式",
-      straightRule: "順子：連續4張 → 總和的負分",
+      straightRule: "順子：連續4張 → 實際值總和的負分（10=10, K=13）",
       multiplierRule: "倍數：倒數第二回合 x2，最後回合 x3",
       memoRule: "無記牌提示：需記住已看過的牌",
       confirm: "確認",
@@ -212,7 +212,7 @@ const zhTw = {
       queenScore: "12分",
       bonus: "獎勵",
       pairDesc: "對子：兩張相同數字的牌上下排列，則兩張皆為 0 分",
-      straightDesc: "順子（進階模式）：橫排連續數字 → 總和的負分",
+      straightDesc: "順子（進階模式）：連續4張 → 實際值總和的負分（10=10, K=13, A=1）。其餘牌另外計分。自動選擇總和最大的順子",
       multiplierDesc: "回合倍數（進階模式）：倒數第二回合 x2，最後回合 x3",
       otherRules: "其他規則",
       deckRule: "2～3人：1副牌（52張）/ 4人以上：2副牌（104張）",

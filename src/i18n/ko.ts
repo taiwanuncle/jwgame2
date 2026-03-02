@@ -109,7 +109,7 @@ const ko = {
       zeroBadge: "0점!",
       // Advanced popup
       advancedTitle: "상급자 모드",
-      straightRule: "스트레이트: 연속 4장 → 합계의 마이너스",
+      straightRule: "스트레이트: 연속 4장 → 실제 값 합계의 마이너스 (10=10, K=13)",
       multiplierRule: "배수: 끝에서 2번째 라운드 x2, 마지막 x3",
       memoRule: "카드 메모 없음: 본 카드를 기억해야 함",
       confirm: "확인",
@@ -212,7 +212,7 @@ const ko = {
       queenScore: "12점",
       bonus: "보너스",
       pairDesc: "페어: 같은 숫자 카드 2장이 세로로 나란히 있으면 두 카드 모두 0점",
-      straightDesc: "스트레이트 (상급자 모드): 가로 한 줄이 연속 숫자 → 합계의 마이너스",
+      straightDesc: "스트레이트 (상급자 모드): 연속 4장 → 실제 값 합계의 마이너스 (10=10, K=13, A=1). 나머지 카드는 별도 계산. 가장 합이 큰 스트레이트 자동 선택",
       multiplierDesc: "라운드 배수 (상급자 모드): 끝에서 2번째 라운드 x2, 마지막 라운드 x3",
       otherRules: "기타 규칙",
       deckRule: "2~3인: 카드 1벌(52장) / 4인 이상: 카드 2벌(104장)",
