@@ -76,7 +76,16 @@ export default function InstallPrompt() {
   // KakaoTalk handlers
   const handleKakaoOpen = useCallback(() => {
     const url = window.location.href;
-    window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+    const ua = navigator.userAgent.toLowerCase();
+    const isiOS = /iphone|ipad|ipod/.test(ua);
+
+    if (isiOS) {
+      // iOS KakaoTalk: use KakaoTalk's openExternal scheme
+      window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(url)}`;
+    } else {
+      // Android: use intent scheme to open in Chrome
+      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+    }
   }, []);
 
   const handleKakaoClose = useCallback(() => {

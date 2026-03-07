@@ -88,6 +88,7 @@ export default function LobbyPage({ onCreateRoom, onJoinRoom, errorMsg, availabl
   if (mode === 'menu') {
     return (
       <div className="page lobby-page">
+        <InstallPrompt />
         <div className="floating-music-toggle">
           <MusicToggle />
           <LanguageToggle />
